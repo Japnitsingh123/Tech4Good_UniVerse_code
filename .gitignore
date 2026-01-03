@@ -1,0 +1,17 @@
+node_modules/
+.DS_Store
+*.sql
+*.pdf
+*.key
+*.csv
+backend/timetable-data.json
+backend/subjects.json
+node_modules/
+.DS_Store
+*.sql
+*.pdf
+*.key
+*.csv
+backend/timetable-data.json
+backend/subjects.json
+**/.env
