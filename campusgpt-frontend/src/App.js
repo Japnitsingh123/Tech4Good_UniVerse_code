@@ -297,7 +297,11 @@ function App() {
     scrollToBottom();
   }, [messages, isLoading]);
 
-  const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5001";
+  const API_URL =
+    process.env.REACT_APP_API_URL ||
+    (typeof window !== "undefined" && window.location.hostname === "localhost"
+      ? "http://localhost:5001"
+      : "");
 
   // Fetch batch timetable when batch or day changes in Timetable tab
   useEffect(() => {

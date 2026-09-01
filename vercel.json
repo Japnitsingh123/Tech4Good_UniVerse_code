@@ -1,0 +1,38 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "campusgpt-frontend/package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "build"
+      }
+    },
+    {
+      "src": "backend/server.js",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "backend/server.js"
+    },
+    {
+      "src": "/static/(.*)",
+      "dest": "campusgpt-frontend/build/static/$1"
+    },
+    {
+      "src": "/favicon.ico",
+      "dest": "campusgpt-frontend/build/favicon.ico"
+    },
+    {
+      "src": "/manifest.json",
+      "dest": "campusgpt-frontend/build/manifest.json"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "campusgpt-frontend/build/index.html"
+    }
+  ]
+}
