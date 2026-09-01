@@ -20,19 +20,19 @@
     },
     {
       "src": "/static/(.*)",
-      "dest": "campusgpt-frontend/build/static/$1"
+      "dest": "/static/$1"
     },
     {
       "src": "/favicon.ico",
-      "dest": "campusgpt-frontend/build/favicon.ico"
+      "dest": "/favicon.ico"
     },
     {
       "src": "/manifest.json",
-      "dest": "campusgpt-frontend/build/manifest.json"
+      "dest": "/manifest.json"
     },
     {
       "src": "/(.*)",
-      "dest": "campusgpt-frontend/build/index.html"
+      "dest": "/index.html"
     }
   ]
 }
