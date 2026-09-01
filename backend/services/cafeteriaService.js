@@ -1,127 +1,126 @@
 // backend/services/cafeteriaService.js
 
-// --- UPDATE THIS DATA ---
 const cafeteriaData = [
   {
     name: "Pizza Nation",
-    keywords: ["pizza", "pizza nation", "nation", "menu"],
-    menuImageUrl: "https://i.ibb.co/LzWrk0NY/pizza-Nation-menu.jpg", // <-- REPLACE
-    scannerImageUrl: "https://i.ibb.co/JFHbQHtX/pizza-Nation-scanner.jpg", // <-- REPLACE
+    keywords: ["pizza", "pizza nation", "nation", "pizza nation menu"],
+    menuImageUrl: "https://i.ibb.co/LzWrk0NY/pizza-Nation-menu.jpg",
+    scannerImageUrl: "https://i.ibb.co/JFHbQHtX/pizza-Nation-scanner.jpg",
   },
   {
-    name: "Dessert Club Menu",
-    keywords: ["dessert", "dessert club"],
-    menuImageUrl: "https://i.ibb.co/4ZHyv39Y/dessert-Club-menu.jpg", // <-- REPLACE
-    scannerImageUrl: "https://i.ibb.co/sp2kWRgN/dessert-Club-scanner.jpg", // <-- REPLACE
+    name: "Dessert Club",
+    keywords: ["dessert", "dessert club", "ice cream", "waffle", "sweet", "dessert club menu"],
+    menuImageUrl: "https://i.ibb.co/4ZHyv39Y/dessert-Club-menu.jpg",
+    scannerImageUrl: "https://i.ibb.co/sp2kWRgN/dessert-Club-scanner.jpg",
   },
   {
     name: "Chilli Chitkara",
-    keywords: ["chilli", "chilli chitkara", "chitkara"],
-    menuImageUrl: "https://i.ibb.co/xqPNmDy1/chilli-Chitkara-menu.jpg", // <-- REPLACE
-    scannerImageUrl: "aksgf", // <-- REPLACE
+    keywords: ["chilli", "chilli chitkara", "chitkara", "chinese", "chilli chatkara"],
+    menuImageUrl: "https://i.ibb.co/xqPNmDy1/chilli-Chitkara-menu.jpg",
+    scannerImageUrl: "",
   },
   {
-    name: "G-Block",
-    keywords: ["g block", "g-block"],
-    menuImageUrl: "https://i.ibb.co/S4d8Px6b/GBlock-Canteen-menu.jpg", // <-- REPLACE
-    scannerImageUrl: "kahsgf", // <-- REPLACE
+    name: "G-Block Canteen",
+    keywords: ["g block", "g-block", "gblock", "g block canteen"],
+    menuImageUrl: "https://i.ibb.co/S4d8Px6b/GBlock-Canteen-menu.jpg",
+    scannerImageUrl: "",
   },
   {
     name: "Jaggi Samosa Shop",
-    keywords: ["samosa", "jaggi samosa", "royal bite"],
-    menuImageUrl: "https://i.ibb.co/tMXZhL4b/Jaggi-Samosa-menu.jpg", // <-- REPLACE
-    scannerImageUrl: "https://i.ibb.co/d4D6LQC1/jaggi-Samosa-scanner.jpg", // <-- REPLACE
+    keywords: ["samosa", "jaggi samosa", "royal bite", "jaggi snacks"],
+    menuImageUrl: "https://i.ibb.co/tMXZhL4b/Jaggi-Samosa-menu.jpg",
+    scannerImageUrl: "https://i.ibb.co/d4D6LQC1/jaggi-Samosa-scanner.jpg",
   },
   {
     name: "Jaggi Juice Shop",
-    keywords: [
-      "juice",
-      "jaggi juice",
-      "jeona khan",
-      "juice",
-      "fruit",
-      "fruits",
-    ],
-    menuImageUrl: "https://i.ibb.co/27KVvyws/jaggi-Juice-menu.jpg", // <-- REPLACE
-    scannerImageUrl: "https://i.ibb.co/d0G2MQbQ/jaggi-Juice-scanner.jpg", // <-- REPLACE
+    keywords: ["juice", "jaggi juice", "shakes", "fruit juice", "fresh juice", "jeona khan"],
+    menuImageUrl: "https://i.ibb.co/27KVvyws/jaggi-Juice-menu.jpg",
+    scannerImageUrl: "https://i.ibb.co/d0G2MQbQ/jaggi-Juice-scanner.jpg",
   },
   {
-    name: "Sips and bite",
-    keywords: ["sips", "sips and bite", "sip and bite"],
-    menuImageUrl: "https://i.ibb.co/5fv8Tz3/sips-And-Bites-menu.jpg", // <-- REPLACE
-    scannerImageUrl: "kjsdf", // <-- REPLACE
+    name: "Sips and Bites",
+    keywords: ["sips", "sips and bite", "sips and bites", "sip and bite", "sips & bites"],
+    menuImageUrl: "https://i.ibb.co/5fv8Tz3/sips-And-Bites-menu.jpg",
+    scannerImageUrl: "",
   },
   {
-    name: "Cos All Shops",
-    keywords: ["cos", "cos shops", "cos info", "shop", "shops"],
-    menuImageUrl: "https://i.ibb.co/DDJgvTm3/cos.jpg", // <-- REPLACE
-    scannerImageUrl: "kjsdf", // <-- REPLACE
+    name: "COS All Shops",
+    keywords: ["cos", "cos shops", "cos info", "cos market", "cos complex"],
+    menuImageUrl: "https://i.ibb.co/DDJgvTm3/cos.jpg",
+    scannerImageUrl: "",
   },
   {
-    name: "Academic Calander",
-    keywords: ["academic calander", "calander"],
-    menuImageUrl:
-      "https://i.ibb.co/C32KHmWy/Screenshot-2025-11-04-at-1-56-16-AM.png", // <-- REPLACE
+    name: "Academic Calendar",
+    keywords: ["academic calendar", "calendar", "academic calander", "schedule calendar"],
+    menuImageUrl: "https://i.ibb.co/C32KHmWy/Screenshot-2025-11-04-at-1-56-16-AM.png",
+    scannerImageUrl: "",
   },
   {
-    name: "Nascafe",
-    keywords: ["Nescafe Menu", "Nescafe", "nescafe"],
-    menuImageUrl: "https://i.ibb.co/WNqDTVPJ/Nescafe-menu.jpg", // <-- REPLACE
+    name: "Nescafe",
+    keywords: ["nescafe", "nascafe", "nescafe menu", "coffee", "tea"],
+    menuImageUrl: "https://i.ibb.co/WNqDTVPJ/Nescafe-menu.jpg",
     scannerImageUrl: "https://i.ibb.co/GvkkgVrQ/Nescafe-scannar.jpg",
   },
   {
     name: "Campus Bite",
-    keywords: ["Campus bite", "bite", "campusbite"],
-    menuImageUrl: "https://i.ibb.co/HWWtx26/Campusbite-menu.jpg", // <-- REPLACE
+    keywords: ["campus bite", "bite", "campusbite", "fast food"],
+    menuImageUrl: "https://i.ibb.co/HWWtx26/Campusbite-menu.jpg",
     scannerImageUrl: "https://i.ibb.co/Swwh301L/Campusbite-scanner.jpg",
   },
   {
     name: "Amritsari Naan",
-    keywords: ["Amritsari", "Naan", "amritsari naan"],
-    menuImageUrl: "https://i.ibb.co/23ZLKsgv/Amritsari-kulcha-naan-Menu.jpg", // <-- REPLACE
-    scannerImageUrl:
-      "https://i.ibb.co/q3KYXHP0/Amritsari-kulcha-naan-scannar.jpg",
+    keywords: ["amritsari", "naan", "amritsari naan", "kulcha", "amritsari kulcha"],
+    menuImageUrl: "https://i.ibb.co/23ZLKsgv/Amritsari-kulcha-naan-Menu.jpg",
+    scannerImageUrl: "https://i.ibb.co/q3KYXHP0/Amritsari-kulcha-naan-scannar.jpg",
   },
   {
     name: "Jaggi Cold Coffee",
-    keywords: ["Jaggi", "cold coffee", "Surinder ice cream parlour and shakes"],
-    menuImageUrl: "https://i.ibb.co/mrLnpShQ/Jaggi-cold-coffee-menu.jpg", // <-- REPLACE
+    keywords: ["cold coffee", "jaggi cold coffee", "surinder ice cream", "shakes"],
+    menuImageUrl: "https://i.ibb.co/mrLnpShQ/Jaggi-cold-coffee-menu.jpg",
     scannerImageUrl: "https://i.ibb.co/wFsdcDGG/Jaggi-cold-coffee-scanner.jpg",
   },
   {
     name: "TSLAS Back Canteen",
-    keywords: ["tslas canteen", "tslas back", "near tslas"],
-    menuImageUrl: "https://i.ibb.co/B5zp13Wk/Taslas-Backside-menu.jpg", // <-- REPLACE
-    scannerImageUrl: "kjsdf", // <-- REPLACE
+    keywords: ["tslas canteen", "tslas back", "tslas", "near tslas"],
+    menuImageUrl: "https://i.ibb.co/B5zp13Wk/Taslas-Backside-menu.jpg",
+    scannerImageUrl: "",
   },
+  {
+    name: "Aahar Canteen",
+    keywords: ["aahar", "ahaar", "aahar canteen"],
+    menuImageUrl: "https://i.ibb.co/S4d8Px6b/GBlock-Canteen-menu.jpg",
+    scannerImageUrl: "",
+  }
 ];
-// --- END OF DATA TO UPDATE ---
 
-/**
- * Finds a cafeteria based on keywords in the prompt.
- */
 export function findCafeteria(prompt) {
-  const lowerPrompt = prompt.toLowerCase();
-  // Find the first cafe where one of its keywords is in the prompt
-  return cafeteriaData.find((cafe) =>
-    cafe.keywords.some((kw) => lowerPrompt.includes(kw))
+  if (!prompt) return null;
+  const lowerPrompt = prompt.toLowerCase().trim();
+
+  // 1. Exact or partial match on name
+  let cafe = cafeteriaData.find(
+    (c) => c.name.toLowerCase() === lowerPrompt || lowerPrompt.includes(c.name.toLowerCase()) || c.name.toLowerCase().includes(lowerPrompt)
   );
+  if (cafe) return cafe;
+
+  // 2. Keyword match
+  cafe = cafeteriaData.find((c) =>
+    c.keywords.some((kw) => lowerPrompt.includes(kw.toLowerCase()))
+  );
+  if (cafe) return cafe;
+
+  return null;
 }
 
-/**
- * Returns a list of all available cafeteria names.
- */
 export function listAllCafes() {
   return cafeteriaData.map((cafe) => cafe.name);
 }
 
-/**
- * Returns all keywords for all cafes, for use in analyzePrompt.
- */
 export function getAllCafeKeywords() {
-  const allKeywords = new Set(["cafe", "canteen", "scanner"]);
+  const allKeywords = new Set(["cafe", "canteen", "cafeteria", "scanner", "menu", "food", "snacks"]);
   cafeteriaData.forEach((cafe) => {
     cafe.keywords.forEach((kw) => allKeywords.add(kw));
+    allKeywords.add(cafe.name.toLowerCase());
   });
   return Array.from(allKeywords);
 }

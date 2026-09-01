@@ -1,0 +1,119 @@
+[
+  {
+    "code": "UCS312",
+    "subjectCode": "UCS312",
+    "name": "Database Management Systems",
+    "credit": "4.0",
+    "isCore": "Yes",
+    "ltp": "3-0-2",
+    "description": "Introduction to database systems, relational data model, ER modeling, SQL queries, normalization (1NF to BCNF), transaction management, ACID properties, and indexing techniques."
+  },
+  {
+    "code": "UCS301",
+    "subjectCode": "UCS301",
+    "name": "Data Structures and Algorithms",
+    "credit": "4.5",
+    "isCore": "Yes",
+    "ltp": "3-1-2",
+    "description": "Analysis of algorithms, asymptotic notation, linear data structures (stacks, queues, linked lists), non-linear data structures (trees, heaps, AVL, B-trees, graphs), sorting and searching algorithms."
+  },
+  {
+    "code": "UCS303",
+    "subjectCode": "UCS303",
+    "name": "Operating Systems",
+    "credit": "4.0",
+    "isCore": "Yes",
+    "ltp": "3-0-2",
+    "description": "Process management, threads, CPU scheduling algorithms, synchronization (semaphores, mutexes), deadlocks, virtual memory, paging, segmentation, and file system management."
+  },
+  {
+    "code": "UCS405",
+    "subjectCode": "UCS405",
+    "name": "Discrete Mathematical Structures",
+    "credit": "3.5",
+    "isCore": "Yes",
+    "ltp": "3-1-0",
+    "description": "Propositional and predicate logic, set theory, relations, equivalence relations, partial orderings, functions, recurrence relations, graph theory, and trees."
+  },
+  {
+    "code": "UCS415",
+    "subjectCode": "UCS415",
+    "name": "Computer Networks",
+    "credit": "4.0",
+    "isCore": "Yes",
+    "ltp": "3-0-2",
+    "description": "Layered network architecture, OSI and TCP/IP reference models, data link protocols, IP addressing, routing algorithms (OSPF, BGP), transport layer (TCP/UDP), socket programming, and network security."
+  },
+  {
+    "code": "UCS507",
+    "subjectCode": "UCS507",
+    "name": "Computer Architecture and Organization",
+    "credit": "4.0",
+    "isCore": "Yes",
+    "ltp": "3-1-0",
+    "description": "Von Neumann architecture, instruction cycle, register transfer logic, arithmetic logic unit, pipelining, hazards, memory hierarchy, cache mapping, and I/O interfacing."
+  },
+  {
+    "code": "UCS503",
+    "subjectCode": "UCS503",
+    "name": "Software Engineering",
+    "credit": "3.5",
+    "isCore": "Yes",
+    "ltp": "3-0-2",
+    "description": "Software development life cycles (SDLC), Agile and Scrum methodologies, UML modeling, requirements engineering, software architectural patterns, unit testing, and continuous integration."
+  },
+  {
+    "code": "UCS608",
+    "subjectCode": "UCS608",
+    "name": "Artificial Intelligence",
+    "credit": "4.0",
+    "isCore": "No",
+    "ltp": "3-0-2",
+    "description": "State-space search (BFS, DFS, A*, minimax with alpha-beta pruning), knowledge representation, probabilistic reasoning, introduction to machine learning, and artificial neural networks."
+  },
+  {
+    "code": "UCS614",
+    "subjectCode": "UCS614",
+    "name": "Cloud Computing",
+    "credit": "3.5",
+    "isCore": "No",
+    "ltp": "3-0-2",
+    "description": "Cloud service architectures (IaaS, PaaS, SaaS), virtualization technologies, containerization (Docker, Kubernetes), AWS cloud services, and cloud security."
+  },
+  {
+    "code": "UMA010",
+    "subjectCode": "UMA010",
+    "name": "Mathematics - I",
+    "credit": "4.0",
+    "isCore": "Yes",
+    "ltp": "3-1-0",
+    "description": "Differential and integral calculus, Taylor series, partial differentiation, vector calculus, matrices, eigenvalues and eigenvectors, and ordinary differential equations."
+  },
+  {
+    "code": "UEE001",
+    "subjectCode": "UEE001",
+    "name": "Electrical Engineering",
+    "credit": "4.0",
+    "isCore": "Yes",
+    "ltp": "3-1-2",
+    "description": "Network theorems (Thevenin, Norton, Superposition), AC single-phase and three-phase circuits, transformers, DC/AC motors, and basic electrical measurements."
+  },
+  {
+    "code": "UPH004",
+    "subjectCode": "UPH004",
+    "name": "Applied Physics",
+    "credit": "4.5",
+    "isCore": "Yes",
+    "ltp": "3-1-2",
+    "description": "Electromagnetic theory, Maxwell's equations, lasers and holography, optical fibers, quantum mechanics, wave-particle duality, and solid-state materials."
+  },
+  {
+    "code": "UTA003",
+    "subjectCode": "UTA003",
+    "name": "Computer Programming",
+    "credit": "4.0",
+    "isCore": "Yes",
+    "ltp": "3-0-2",
+    "description": "Problem-solving techniques, structured programming in C/C++, variables, control flow, functions, arrays, pointers, structures, file handling, and dynamic memory allocation."
+  }
+]

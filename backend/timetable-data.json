@@ -1,0 +1,284 @@
+{
+  "1ST YEAR A": {
+    "1A11": [
+      [
+        { "course": "Timings" },
+        { "course": "Monday" },
+        { "course": "Tuesday" },
+        { "course": "Wednesday" },
+        { "course": "Thursday" },
+        { "course": "Friday" }
+      ],
+      [
+        { "course": "08:00 AM" },
+        { "course": "UMA010 L LP101" },
+        { "course": "UPH004 L LP102" },
+        { "course": "UEE001 L LP101" },
+        { "course": "UTA003 L LP105" },
+        { "course": "UMA010 T LP101" }
+      ],
+      [
+        { "course": "08:50 AM" },
+        { "course": "UMA010 L LP101" },
+        { "course": "UPH004 L LP102" },
+        { "course": "UEE001 L LP101" },
+        { "course": "UTA003 L LP105" },
+        { "course": "PROFESSIONAL COMMUNICATION G123" }
+      ],
+      [
+        { "course": "09:40 AM" },
+        { "course": "UPH004 P PHYS-LAB" },
+        { "course": "UEE001 P ELEC-LAB" },
+        { "course": "UTA003 P COMP-LAB1" },
+        { "course": "PROFESSIONAL COMMUNICATION G123" },
+        { "course": "UPH004 L LP102" }
+      ],
+      [
+        { "course": "10:30 AM" },
+        { "course": "UPH004 P PHYS-LAB" },
+        { "course": "UEE001 P ELEC-LAB" },
+        { "course": "UTA003 P COMP-LAB1" },
+        { "course": "UMA010 L LP101" },
+        { "course": "UEE001 L LP101" }
+      ],
+      [
+        { "course": "11:20 AM" },
+        { "course": "UTA003 L LP105" },
+        { "course": "UMA010 L LP101" },
+        { "course": "UPH004 L LP102" },
+        { "course": "UEE001 T LP101" },
+        { "course": "" }
+      ],
+      [
+        { "course": "01:00 PM" },
+        { "course": "UEE001 L LP101" },
+        { "course": "UTA003 L LP105" },
+        { "course": "UMA010 L LP101" },
+        { "course": "UPH004 T LP102" },
+        { "course": "LIBRARY STUDY LIB2" }
+      ]
+    ],
+    "1A12": [
+      [
+        { "course": "Timings" },
+        { "course": "Monday" },
+        { "course": "Tuesday" },
+        { "course": "Wednesday" },
+        { "course": "Thursday" },
+        { "course": "Friday" }
+      ],
+      [
+        { "course": "08:00 AM" },
+        { "course": "UEE001 L LP102" },
+        { "course": "UMA010 L LP101" },
+        { "course": "UTA003 L LP106" },
+        { "course": "UPH004 L LP103" },
+        { "course": "UMA010 T LP102" }
+      ],
+      [
+        { "course": "08:50 AM" },
+        { "course": "UEE001 L LP102" },
+        { "course": "UMA010 L LP101" },
+        { "course": "UTA003 L LP106" },
+        { "course": "UPH004 L LP103" },
+        { "course": "PROFESSIONAL COMMUNICATION G124" }
+      ],
+      [
+        { "course": "09:40 AM" },
+        { "course": "UTA003 P COMP-LAB2" },
+        { "course": "UPH004 P PHYS-LAB" },
+        { "course": "UEE001 P ELEC-LAB" },
+        { "course": "UMA010 L LP101" },
+        { "course": "UEE001 L LP102" }
+      ],
+      [
+        { "course": "10:30 AM" },
+        { "course": "UTA003 P COMP-LAB2" },
+        { "course": "UPH004 P PHYS-LAB" },
+        { "course": "UEE001 P ELEC-LAB" },
+        { "course": "UTA003 L LP106" },
+        { "course": "UPH004 L LP103" }
+      ],
+      [
+        { "course": "11:20 AM" },
+        { "course": "UPH004 L LP103" },
+        { "course": "UEE001 L LP102" },
+        { "course": "UMA010 L LP101" },
+        { "course": "PROFESSIONAL COMMUNICATION G124" },
+        { "course": "" }
+      ]
+    ]
+  },
+  "2ND YEAR C": {
+    "2C24": [
+      [
+        { "course": "Timings" },
+        { "course": "Monday" },
+        { "course": "Tuesday" },
+        { "course": "Wednesday" },
+        { "course": "Thursday" },
+        { "course": "Friday" }
+      ],
+      [
+        { "course": "08:00 AM" },
+        { "course": "UCS301 L LP201" },
+        { "course": "UCS312 L LP202" },
+        { "course": "UCS303 L LP201" },
+        { "course": "UCS405 L LP203" },
+        { "course": "UCS301 T LP201" }
+      ],
+      [
+        { "course": "08:50 AM" },
+        { "course": "UCS301 L LP201" },
+        { "course": "UCS312 L LP202" },
+        { "course": "UCS303 L LP201" },
+        { "course": "UCS405 L LP203" },
+        { "course": "UCS303 T LP201" }
+      ],
+      [
+        { "course": "09:40 AM" },
+        { "course": "UCS312 P DB-LAB" },
+        { "course": "UCS301 P DSA-LAB" },
+        { "course": "UCS303 P OS-LAB" },
+        { "course": "UCS312 L LP202" },
+        { "course": "UCS405 L LP203" }
+      ],
+      [
+        { "course": "10:30 AM" },
+        { "course": "UCS312 P DB-LAB" },
+        { "course": "UCS301 P DSA-LAB" },
+        { "course": "UCS303 P OS-LAB" },
+        { "course": "UCS301 L LP201" },
+        { "course": "UCS303 L LP201" }
+      ],
+      [
+        { "course": "11:20 AM" },
+        { "course": "UCS405 L LP203" },
+        { "course": "UCS303 L LP201" },
+        { "course": "UCS312 L LP202" },
+        { "course": "UCS405 T LP203" },
+        { "course": "PROJECT LAB CSED" }
+      ],
+      [
+        { "course": "01:00 PM" },
+        { "course": "UCS303 L LP201" },
+        { "course": "UCS405 L LP203" },
+        { "course": "UCS301 L LP201" },
+        { "course": "TECHNICAL SEMINAR CSED" },
+        { "course": "" }
+      ]
+    ],
+    "3C24": [
+      [
+        { "course": "Timings" },
+        { "course": "Monday" },
+        { "course": "Tuesday" },
+        { "course": "Wednesday" },
+        { "course": "Thursday" },
+        { "course": "Friday" }
+      ],
+      [
+        { "course": "08:00 AM" },
+        { "course": "UCS415 L LP301" },
+        { "course": "UCS507 L LP302" },
+        { "course": "UCS503 L LP301" },
+        { "course": "UCS608 L LP303" },
+        { "course": "UCS415 T LP301" }
+      ],
+      [
+        { "course": "08:50 AM" },
+        { "course": "UCS415 L LP301" },
+        { "course": "UCS507 L LP302" },
+        { "course": "UCS503 L LP301" },
+        { "course": "UCS608 L LP303" },
+        { "course": "UCS503 T LP301" }
+      ],
+      [
+        { "course": "09:40 AM" },
+        { "course": "UCS415 P NET-LAB" },
+        { "course": "UCS503 P SE-LAB" },
+        { "course": "UCS608 P AI-LAB" },
+        { "course": "UCS507 L LP302" },
+        { "course": "UCS614 L LP303" }
+      ],
+      [
+        { "course": "10:30 AM" },
+        { "course": "UCS415 P NET-LAB" },
+        { "course": "UCS503 P SE-LAB" },
+        { "course": "UCS608 P AI-LAB" },
+        { "course": "UCS415 L LP301" },
+        { "course": "UCS503 L LP301" }
+      ]
+    ]
+  },
+  "COE": {
+    "COE1": [
+      [
+        { "course": "Timings" },
+        { "course": "Monday" },
+        { "course": "Tuesday" },
+        { "course": "Wednesday" },
+        { "course": "Thursday" },
+        { "course": "Friday" }
+      ],
+      [
+        { "course": "08:00 AM" },
+        { "course": "UCS301 L LP201" },
+        { "course": "UCS312 L LP202" },
+        { "course": "UCS303 L LP201" },
+        { "course": "UCS405 L LP203" },
+        { "course": "UCS301 T LP201" }
+      ],
+      [
+        { "course": "08:50 AM" },
+        { "course": "UCS301 L LP201" },
+        { "course": "UCS312 L LP202" },
+        { "course": "UCS303 L LP201" },
+        { "course": "UCS405 L LP203" },
+        { "course": "UCS303 T LP201" }
+      ],
+      [
+        { "course": "09:40 AM" },
+        { "course": "UCS312 P DB-LAB" },
+        { "course": "UCS301 P DSA-LAB" },
+        { "course": "UCS303 P OS-LAB" },
+        { "course": "UCS312 L LP202" },
+        { "course": "UCS405 L LP203" }
+      ]
+    ],
+    "COE21": [
+      [
+        { "course": "Timings" },
+        { "course": "Monday" },
+        { "course": "Tuesday" },
+        { "course": "Wednesday" },
+        { "course": "Thursday" },
+        { "course": "Friday" }
+      ],
+      [
+        { "course": "08:00 AM" },
+        { "course": "UCS301 L LP201" },
+        { "course": "UCS312 L LP202" },
+        { "course": "UCS303 L LP201" },
+        { "course": "UCS405 L LP203" },
+        { "course": "UCS301 T LP201" }
+      ],
+      [
+        { "course": "08:50 AM" },
+        { "course": "UCS301 L LP201" },
+        { "course": "UCS312 L LP202" },
+        { "course": "UCS303 L LP201" },
+        { "course": "UCS405 L LP203" },
+        { "course": "UCS303 T LP201" }
+      ],
+      [
+        { "course": "09:40 AM" },
+        { "course": "UCS312 P DB-LAB" },
+        { "course": "UCS301 P DSA-LAB" },
+        { "course": "UCS303 P OS-LAB" },
+        { "course": "UCS312 L LP202" },
+        { "course": "UCS405 L LP203" }
+      ]
+    ]
+  }
+}

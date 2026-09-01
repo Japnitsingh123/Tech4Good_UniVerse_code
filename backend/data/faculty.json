@@ -1,0 +1,119 @@
+[
+  {
+    "FacultyID": 1,
+    "Name": "Dr. Raj Kumar Gupta",
+    "Department": "Computer Science and Engineering",
+    "Specialization": "Distributed Systems, Cloud Computing, High Performance Computing",
+    "Office": "A-211 CSED",
+    "Email": "rkgupta@thapar.edu",
+    "link": "https://med.thapar.edu/faculty"
+  },
+  {
+    "FacultyID": 2,
+    "Name": "Dr. Prashant Singh Rana",
+    "Department": "Computer Science and Engineering",
+    "Specialization": "Machine Learning, Deep Learning, Bioinformatics",
+    "Office": "B-105 CSED",
+    "Email": "psrana@thapar.edu",
+    "link": "https://med.thapar.edu/faculty"
+  },
+  {
+    "FacultyID": 3,
+    "Name": "Dr. S.S. Bhatia",
+    "Department": "School of Mathematics",
+    "Specialization": "Pure & Applied Mathematics, Functional Analysis",
+    "Office": "D-302 Mathematics Block",
+    "Email": "ssbhatia@thapar.edu",
+    "link": "https://som.thapar.edu/faculty"
+  },
+  {
+    "FacultyID": 4,
+    "Name": "Dr. Seema Bawa",
+    "Department": "Computer Science and Engineering",
+    "Specialization": "Software Engineering, Cloud Computing, Big Data Analytics",
+    "Office": "A-201 CSED",
+    "Email": "seema@thapar.edu",
+    "link": "https://med.thapar.edu/faculty"
+  },
+  {
+    "FacultyID": 5,
+    "Name": "Dr. Maninder Singh",
+    "Department": "Computer Science and Engineering",
+    "Specialization": "Network & Cyber Security, Vulnerability Assessment",
+    "Office": "A-205 CSED",
+    "Email": "msingh@thapar.edu",
+    "link": "https://med.thapar.edu/faculty"
+  },
+  {
+    "FacultyID": 6,
+    "Name": "Dr. Rajesh Kumar",
+    "Department": "Electrical and Instrumentation Engineering",
+    "Specialization": "Power Systems, Renewable Energy, Smart Grids",
+    "Office": "E-101 EIED",
+    "Email": "rkumar@thapar.edu",
+    "link": "https://eied.thapar.edu/faculty"
+  },
+  {
+    "FacultyID": 7,
+    "Name": "Dr. Inderveer Chhabra",
+    "Department": "Computer Science and Engineering",
+    "Specialization": "Natural Language Processing, Information Retrieval",
+    "Office": "B-204 CSED",
+    "Email": "inderveer@thapar.edu",
+    "link": "https://med.thapar.edu/faculty"
+  },
+  {
+    "FacultyID": 8,
+    "Name": "Dr. Neeraj Kumar",
+    "Department": "Computer Science and Engineering",
+    "Specialization": "IoT, Mobile Cloud Computing, Cyber Security",
+    "Office": "A-208 CSED",
+    "Email": "neeraj.kumar@thapar.edu",
+    "link": "https://med.thapar.edu/faculty"
+  },
+  {
+    "FacultyID": 9,
+    "Name": "Dr. Sharad Saxena",
+    "Department": "Computer Science and Engineering",
+    "Specialization": "Image Processing, Computer Vision, Pattern Recognition",
+    "Office": "B-108 CSED",
+    "Email": "sharad.saxena@thapar.edu",
+    "link": "https://med.thapar.edu/faculty"
+  },
+  {
+    "FacultyID": 10,
+    "Name": "Dr. Anju Bala",
+    "Department": "Computer Science and Engineering",
+    "Specialization": "Cloud Computing, Big Data, Green Computing",
+    "Office": "B-202 CSED",
+    "Email": "anju.bala@thapar.edu",
+    "link": "https://med.thapar.edu/faculty"
+  },
+  {
+    "FacultyID": 11,
+    "Name": "Dr. Deepak Garg",
+    "Department": "Computer Science and Engineering",
+    "Specialization": "Algorithms, Data Mining, Computational Biology",
+    "Office": "A-215 CSED",
+    "Email": "dgarg@thapar.edu",
+    "link": "https://med.thapar.edu/faculty"
+  },
+  {
+    "FacultyID": 12,
+    "Name": "Dr. Tarun Kumar",
+    "Department": "Mechanical Engineering Department",
+    "Specialization": "Thermal Engineering, Heat Transfer, Fluid Mechanics",
+    "Office": "M-102 MED",
+    "Email": "tarun.kumar@thapar.edu",
+    "link": "https://med.thapar.edu/faculty"
+  },
+  {
+    "FacultyID": 13,
+    "Name": "Dr. Ashish Kumar",
+    "Department": "Civil Engineering Department",
+    "Specialization": "Structural Dynamics, Earthquake Engineering",
+    "Office": "C-201 CED",
+    "Email": "ashish.kumar@thapar.edu",
+    "link": "https://ced.thapar.edu/faculty"
+  }
+]

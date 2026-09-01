@@ -1,55 +1,64 @@
 // backend/services/subjectService.js
 import fs from 'fs';
 import path from 'path';
+import { fileURLToPath } from 'url';
 
-let subjects = []; // This will store the data from subjects.json
-const SUBJECTS_PATH = path.resolve('./subjects.json'); // Points to the file in your backend folder
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
-/**
- * Loads the subjects.json data into memory.
- * Called once when the server starts.
- */
-// REPLACE your loadSubjectData function with this one
+let subjects = [];
 
-/**
- * Loads the subjects.json data into memory.
- * Called once when the server starts.
- */
+const possiblePaths = [
+  path.resolve(__dirname, '../subjects.json'),
+  path.resolve(__dirname, '../../subjects.json'),
+  path.resolve('./subjects.json'),
+  path.resolve('./backend/subjects.json'),
+];
+
 export function loadSubjectData() {
-  console.log(`▶ Loading subject data from local file: ${SUBJECTS_PATH}`);
-  try {
-    const fileContent = fs.readFileSync(SUBJECTS_PATH, 'utf8');
-    const parsedData = JSON.parse(fileContent);
+  let loaded = false;
+  for (const p of possiblePaths) {
+    if (fs.existsSync(p)) {
+      try {
+        console.log(`▶ Loading subject data from: ${p}`);
+        const fileContent = fs.readFileSync(p, 'utf8');
+        const parsedData = JSON.parse(fileContent);
 
-    let subjectArray;
+        let subjectArray = [];
+        if (Array.isArray(parsedData)) {
+          subjectArray = parsedData;
+        } else if (typeof parsedData === 'object' && parsedData !== null) {
+          subjectArray = Object.values(parsedData);
+        }
 
-    // --- FIX: Check if parsed data is an array or an object ---
-    if (Array.isArray(parsedData)) {
-      // It's already an array, use it directly
-      subjectArray = parsedData;
-    } else if (typeof parsedData === 'object' && parsedData !== null) {
-      // It's an object. Let's assume the subjects are the *values* of this object.
-      // e.g., { "UCS312": { "name": ... }, "UCS411": { "name": ... } }
-      console.log("ℹ️ subjects.json is an object, converting values to an array.");
-      subjectArray = Object.values(parsedData);
-    } else {
-      // It's something else (e.g., just a string or number), which is wrong.
-      throw new Error("JSON data is not an array or a valid object.");
+        subjects = subjectArray.map((subject) => {
+          const code = (subject.subjectCode || subject.code || '').trim().toUpperCase();
+          const name = (subject.name || subject.subject_name || '').trim();
+          return {
+            ...subject,
+            code: code,
+            subjectCode: code,
+            name: name,
+            credit: subject.credit || subject.credits || '4.0',
+            isCore: subject.isCore || (subject.is_core ? 'Yes' : 'No') || 'Yes',
+            ltp: subject.ltp || '3-0-2',
+            description: subject.description || 'Subject curriculum and syllabus information.',
+            searchCode: code.replace(/[^A-Z0-9]/gi, ''),
+            searchName: name.toLowerCase(),
+          };
+        });
+
+        console.log(`✅ Successfully loaded ${subjects.length} subject entries.`);
+        loaded = true;
+        break;
+      } catch (err) {
+        console.error(`❌ Error parsing subject file at ${p}:`, err.message);
+      }
     }
-    // --- END FIX ---
-    
-    // Pre-process data for easier searching
-    subjects = subjectArray.map(subject => ({
-        ...subject,
-        // Create searchable versions
-        searchCode: subject.code ? subject.code.toUpperCase() : '', 
-        searchName: subject.name ? subject.name.toLowerCase() : ''
-    }));
+  }
 
-    console.log(`✅ Successfully loaded ${subjects.length} subject entries.`);
-  } catch (err) {
-    console.error('❌ ERROR: Could not load subjects.json.', err.message);
-    console.error("   Make sure 'subjects.json' exists in your 'backend' folder and is a valid JSON array or object.");
+  if (!loaded) {
+    console.warn("⚠️ Warning: Could not find 'subjects.json'. Default subject list will be empty.");
   }
 }
 
@@ -57,21 +66,56 @@ export function loadSubjectData() {
  * Finds a single subject by code or name.
  */
 export function findSubject(query) {
-  if (!query || subjects.length === 0) {
-    return null;
-  }
+  if (!query) return null;
+  if (subjects.length === 0) loadSubjectData();
+  if (subjects.length === 0) return null;
 
   const cleanQuery = query.trim();
   const upperQuery = cleanQuery.toUpperCase();
   const lowerQuery = cleanQuery.toLowerCase();
+  const alphanumericQuery = upperQuery.replace(/[^A-Z0-9]/gi, '');
 
-  // Try to find by exact code first
-  let subject = subjects.find(s => s.searchCode === upperQuery);
+  // 1. Exact match on normalized code (e.g. UCS312, UCS 312)
+  let subject = subjects.find((s) => s.searchCode === alphanumericQuery);
   if (subject) return subject;
 
-  // Try to find by partial name
-  subject = subjects.find(s => s.searchName.includes(lowerQuery));
+  // 2. Partial match on code inside query (e.g. "tell me about UCS303")
+  subject = subjects.find((s) => s.searchCode.length > 3 && (upperQuery.includes(s.searchCode) || alphanumericQuery.includes(s.searchCode)));
   if (subject) return subject;
 
-  return null; // No match found
+  // 3. Exact match on name
+  subject = subjects.find((s) => s.searchName === lowerQuery);
+  if (subject) return subject;
+
+  // 4. Partial substring match on name
+  const filteredWords = lowerQuery
+    .replace(/\b(subject|course|syllabus|details|info|tell|me|about|what|is|the|credit|credits)\b/gi, '')
+    .trim();
+
+  if (filteredWords.length >= 3) {
+    subject = subjects.find((s) => s.searchName.includes(filteredWords) || filteredWords.includes(s.searchName));
+    if (subject) return subject;
+  }
+
+  // 5. Multi-token match
+  const tokens = filteredWords.split(/\s+/).filter((w) => w.length > 2);
+  if (tokens.length > 0) {
+    let bestMatch = null;
+    let maxMatches = 0;
+    for (const s of subjects) {
+      const matchCount = tokens.filter((t) => s.searchName.includes(t)).length;
+      if (matchCount > maxMatches) {
+        maxMatches = matchCount;
+        bestMatch = s;
+      }
+    }
+    if (maxMatches > 0) return bestMatch;
+  }
+
+  return null;
+}
+
+export function listAllSubjects() {
+  if (subjects.length === 0) loadSubjectData();
+  return subjects.map((s) => `${s.code} - ${s.name}`);
 }

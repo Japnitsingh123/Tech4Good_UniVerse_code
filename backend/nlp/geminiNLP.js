@@ -1,12 +1,21 @@
+// backend/nlp/geminiNLP.js
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+let genAI = null;
+if (process.env.GEMINI_API_KEY) {
+  try {
+    genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+  } catch (e) {
+    console.warn("⚠️ GoogleGenerativeAI init warning:", e.message);
+  }
+}
 
 const SYSTEM_PROMPT = `
-You are an NLP engine for a University Campus Assistant.
-Output ONLY JSON: {"intent":"...","entities":{...}}
+You are an NLP engine for a University Campus Assistant (Thapar University CampusGPT).
+Output ONLY valid JSON in format: {"intent":"...","entities":{...}}
 
 INTENTS:
+- greeting
 - timetable_info
 - cafeteria_menu
 - subject_info
@@ -17,48 +26,53 @@ INTENTS:
 - general_query
 
 RULES:
-When user asks for faculty details:
-- Extract only the faculty name, not the whole sentence.
-- Remove words like "tell", "details", "faculty", "information", "about".
+1. If user greets (hi, hello, hey, who are you, help) -> "greeting"
+2. If subject code (UCS312, UCS301, UMA010) or subject/syllabus/course inquiry -> "subject_info" (extract entity: "subject")
+3. If message contains a section/batch code (e.g. 1A11, 2C24, COE21) or asks for class schedule -> "timetable_info" (extract entities: "section", "day")
+4. If cafeteria/canteen/food/menu/shop mentioned -> "cafeteria_menu" (extract entity: "cafeteria")
+5. If certificate/affidavit/undertaking/quota mentioned -> "certificate_info"
+6. If academic procedures (group change, add/drop subject, elective change, fee delay, auxiliary exam, makeup mst, attendance shortage, detention, bonafide, hostel booking) -> "doaa_info"
+7. If doctor, health center, medical, dispensary, sick -> "dispensary_info"
+8. If faculty/professor/teacher name inquiry -> "faculty_info" (extract entity: "faculty_name" containing ONLY the name)
+9. Else -> "general_query"
 
-1. If message contains a section code → timetable_info
-2. If cafeteria keyword appears → cafeteria_menu
-3. If subject code or subject-related keywords → subject_info
-4. Certificate keywords → certificate_info
-5. DOAA keywords → doaa_info
-6. Dispensary keywords → dispensary_info
-7. Faculty-related keywords OR message looks like a human name → faculty_info
-8. Else → general_query
-
-Respond ONLY JSON.
+Output ONLY raw JSON.
 `;
-
-// ---------------------------------------------
-// CONSTANT KEYWORDS
-// ---------------------------------------------
 
 const CAFE_KEYWORDS = [
   "pizza nation",
   "dessert club",
+  "chilli chitkara",
   "chilli chatkara",
   "g block",
   "g-block",
   "jaggi samosa",
   "jaggi juice",
   "sips and bite",
+  "sips and bites",
   "cos all shops",
-  ,
+  "cos shops",
   "tslas back canteen",
+  "tslas canteen",
   "nascafe",
   "nescafe",
   "campus bite",
-  "bite",
   "campusbite",
-  "Amritsari naan",
-  "Aahar",
+  "amritsari naan",
+  "amritsari kulcha",
+  "aahar",
   "ahaar",
   "cold coffee",
+  "academic calendar",
   "academic calander",
+  "canteen",
+  "cafeteria",
+  "cafes",
+  "food",
+  "snack",
+  "juice",
+  "samosa",
+  "pizza",
 ];
 
 const CERTIFICATE_KEYWORDS = [
@@ -66,229 +80,252 @@ const CERTIFICATE_KEYWORDS = [
   "affidavit",
   "obc",
   "backward class",
-  "gap",
-  "income",
-  "nri",
-  "sponsor",
-  "residency",
+  "gap period",
+  "gap year",
+  "income certificate",
+  "nri sponsorship",
+  "nri affidavit",
+  "punjab residency",
+  "punjab quota",
   "undertaking",
   "drug abuse",
   "anti drug",
   "anti alcohol",
-  "punjab",
   "principal certificate",
   "st certificate",
   "sc certificate",
-  "NRI",
-  "nri",
-  "ANTI_DRUG_PARENT",
-  ,
-  "what is  certificate",
+  "caste certificate",
+  "domicile",
+  "medical certificate",
 ];
 
 const DISPENSARY_KEYWORDS = [
   "dispensary",
-  "medical",
+  "medical center",
   "doctor",
   "health center",
+  "health clinic",
   "clinic",
   "sick",
   "injury",
   "health issue",
+  "first aid",
+  "ambulance",
+  "medicine",
+  "hospital",
 ];
 
 const DOAA_KEYWORDS = [
-  "scholarship",
   "group change",
   "subgroup",
+  "sub-group",
   "sub group",
   "change section",
   "change group",
   "switch group",
+  "switch section",
+  "section change",
   "add subject",
   "additional subject",
+  "add course",
   "backlog",
+  "backlog registration",
   "drop subject",
   "withdraw subject",
+  "remove subject",
+  "drop course",
   "registration issue",
   "elective change",
   "generic elective",
+  "free elective",
   "professional elective",
   "missed filling",
   "choice filling",
   "auxiliary exam",
   "auxiliary",
   "makeup test",
-  "mst",
+  "make-up test",
+  "missed mst",
   "absence",
   "attendance",
+  "attendence",
+  "shortage",
+  "detention",
   "semester drop",
-  "noc",
-  "visa",
+  "drop semester",
   "bonafide",
   "migration",
-  "drop",
-  "detention",
-  "attendence",
-  "phd",
-  "Absence",
-  "room book",
-  "booking",
-  "book",
-  "PHD",
-  "Hostel",
-  "CGPA",
-  "nri certificate",
+  "hostel room",
+  "room booking",
+  "fee delay",
+  "scholarship",
+  "doaa",
 ];
 
-const SUBJECT_NAME_KEYWORDS = [
-  "subject",
-  "syllabus",
-  "topics",
-  "course",
-  "explain",
-  "details of subject",
-  "what is",
-  "explain subject",
+const GREETING_KEYWORDS = [
+  "hi",
+  "hello",
+  "hey",
+  "greetings",
+  "good morning",
+  "good afternoon",
+  "good evening",
+  "who are you",
+  "what can you do",
+  "help",
+  "commands",
 ];
 
-const FACULTY_KEYWORDS = [
-  "faculty",
-  "professor",
-  "teacher",
-  "who teaches",
-  "sir",
-  "madam",
-  "hod",
-  "head of department",
-  "dr",
-  "mr ",
-  "ms ",
-  "mrs ",
+const DAYS = [
+  "monday",
+  "tuesday",
+  "wednesday",
+  "thursday",
+  "friday",
+  "saturday",
+  "sunday",
 ];
-
-// ---------------------------------------------
-// NLP FUNCTION
-// ---------------------------------------------
 
 export async function analyzeMessage(message) {
-  const lower = message.toLowerCase();
+  if (!message || typeof message !== "string") {
+    return { intent: "general_query", entities: {} };
+  }
+
+  const trimmed = message.trim();
+  const lower = trimmed.toLowerCase();
   let parsed = { intent: "general_query", entities: {} };
 
-  // --------------------------- GEMINI PASS ---------------------------
-  try {
-    const model = genAI.getGenerativeModel({
-      model: "gemini-2.5-flash-preview-09-2025",
-    });
-
-    const result = await model.generateContent({
-      contents: [
-        {
-          role: "user",
-          parts: [{ text: SYSTEM_PROMPT + "\nUser: " + message }],
-        },
-      ],
-    });
-
-    let text = result.response.text().trim();
-    text = text
-      .replace(/```json/i, "")
-      .replace(/```/g, "")
-      .trim();
-
+  // --------------------------- 1. GEMINI LLM PASS ---------------------------
+  if (genAI) {
     try {
-      parsed = JSON.parse(text);
-      if (!parsed.entities) parsed.entities = {};
-    } catch {}
-  } catch {}
+      const model = genAI.getGenerativeModel({
+        model: "gemini-1.5-flash",
+      });
 
-  // ---------------------------------------------
-  // 1️⃣ TIMETABLE
-  // ---------------------------------------------
-  const secMatch = message.match(/\b[1-4][A-Za-z]{1,5}[0-9]{1,2}\b/);
-  if (secMatch) {
-    parsed.intent = "timetable_info";
-    parsed.entities.section = secMatch[0].toUpperCase();
+      const result = await model.generateContent({
+        contents: [
+          {
+            role: "user",
+            parts: [{ text: SYSTEM_PROMPT + "\nUser: " + trimmed }],
+          },
+        ],
+      });
+
+      let text = result.response.text().trim();
+      text = text
+        .replace(/```json/gi, "")
+        .replace(/```/g, "")
+        .trim();
+
+      const jsonParsed = JSON.parse(text);
+      if (jsonParsed && jsonParsed.intent) {
+        parsed = jsonParsed;
+        if (!parsed.entities) parsed.entities = {};
+        if (parsed.intent !== "general_query") {
+          return parsed;
+        }
+      }
+    } catch (e) {}
+  }
+
+  // --------------------------- 2. DETERMINISTIC RULE-BASED NLP ---------------------------
+
+  // A. GREETING
+  if (GREETING_KEYWORDS.some((g) => lower === g || lower.startsWith(g + " "))) {
+    parsed.intent = "greeting";
     return parsed;
   }
 
-  // ---------------------------------------------
-  // 2️⃣ CAFETERIA
-  // ---------------------------------------------
-  if (CAFE_KEYWORDS.some((k) => lower.includes(k))) {
-    parsed.intent = "cafeteria_menu";
-    parsed.entities.cafeteria = CAFE_KEYWORDS.find((k) => lower.includes(k));
+  // B. SUBJECT CODE CHECK (High priority: 3 letters + 3 digits, e.g. UCS312, UMA010, UEE001)
+  const subjectCodeMatch = trimmed.match(/\b([A-Za-z]{3}\d{3})\b/i);
+  if (subjectCodeMatch) {
+    parsed.intent = "subject_info";
+    parsed.entities.subject = subjectCodeMatch[0].toUpperCase();
     return parsed;
   }
 
-  // ---------------------------------------------
-  // 3️⃣ DOAA
-  // ---------------------------------------------
+  // C. DOAA PROCEDURES (High priority academic procedures)
   if (DOAA_KEYWORDS.some((k) => lower.includes(k))) {
     parsed.intent = "doaa_info";
-    parsed.entities.query = message;
+    parsed.entities.query = trimmed;
     return parsed;
   }
 
-  // ---------------------------------------------
-  // 4️⃣ SUBJECT CODE
-  // ---------------------------------------------
-  const subjectCode = message.match(/[A-Z]{2,4}\d{3}/i);
-  if (subjectCode) {
+  // D. TIMETABLE
+  // Match batch code pattern: 1A11, 2C24, 3C24, COE1, COE21, ENC1, G1
+  const batchRegex = /\b([1-4][A-Za-z]{1,2}[0-9]{1,2}|COE[0-9]{1,2}|ENC[0-9]{1,2}|G[0-9]{1,2})\b/i;
+  const batchMatch = trimmed.match(batchRegex);
+  const dayMatch = DAYS.find((d) => lower.includes(d));
+
+  if (batchMatch && (lower.includes("timetable") || lower.includes("schedule") || lower.includes("class") || lower.split(/\s+/).length <= 4)) {
+    parsed.intent = "timetable_info";
+    parsed.entities.section = batchMatch[0].toUpperCase().replace(/\s+/g, "");
+    if (dayMatch) parsed.entities.day = dayMatch;
+    return parsed;
+  }
+
+  if (lower.includes("timetable") || lower.includes("class schedule") || lower.includes("schedule today")) {
+    parsed.intent = "timetable_info";
+    if (batchMatch) parsed.entities.section = batchMatch[0].toUpperCase();
+    if (dayMatch) parsed.entities.day = dayMatch;
+    return parsed;
+  }
+
+  // E. CAFETERIA
+  if (CAFE_KEYWORDS.some((k) => lower.includes(k))) {
+    parsed.intent = "cafeteria_menu";
+    const matchedCafe = CAFE_KEYWORDS.find((k) => lower.includes(k));
+    if (matchedCafe && !["canteen", "cafeteria", "cafes", "food", "snack", "menu"].includes(matchedCafe)) {
+      parsed.entities.cafeteria = matchedCafe;
+    }
+    return parsed;
+  }
+
+  // F. SUBJECT BY NAME
+  if (
+    lower.includes("subject") ||
+    lower.includes("syllabus") ||
+    lower.includes("credits") ||
+    lower.includes("credit") ||
+    lower.includes("course details") ||
+    lower.includes("database management") ||
+    lower.includes("data structures") ||
+    lower.includes("operating systems") ||
+    lower.includes("computer networks") ||
+    lower.includes("discrete math") ||
+    lower.includes("software engineering") ||
+    lower.includes("applied physics") ||
+    lower.includes("computer programming")
+  ) {
     parsed.intent = "subject_info";
-    parsed.entities.subject = subjectCode[0].toUpperCase();
+    parsed.entities.subject = trimmed;
     return parsed;
   }
 
-  // SUBJECT (NATURAL LANGUAGE)
-  if (SUBJECT_NAME_KEYWORDS.some((k) => lower.includes(k))) {
-    parsed.intent = "subject_info";
-    parsed.entities.subject = message;
-    return parsed;
-  }
-
-  // ---------------------------------------------
-  // 5️⃣ CERTIFICATE
-  // ---------------------------------------------
+  // G. CERTIFICATE INFO
   if (CERTIFICATE_KEYWORDS.some((k) => lower.includes(k))) {
     parsed.intent = "certificate_info";
     return parsed;
   }
 
-  // ---------------------------------------------
-  // 6️⃣ DISPENSARY
-  // ---------------------------------------------
+  // H. DISPENSARY
   if (DISPENSARY_KEYWORDS.some((k) => lower.includes(k))) {
     parsed.intent = "dispensary_info";
     return parsed;
   }
 
-  // ---------------------------------------------
-  // 7️⃣ FACULTY DETECTION (HUMAN NAME + KEYWORDS)
-  // ---------------------------------------------
+  // I. FACULTY DETECTION
+  const facultyKeywordRegex = /\b(faculty|professor|prof|teacher|who teaches|who is|dr|sir|madam|hod|head of department)\b/i;
+  const isHumanName = /^(dr\.?|prof\.?|mr\.?|ms\.?)?\s*([a-zA-Z]{2,15}\s+){1,3}[a-zA-Z]{2,15}$/i.test(trimmed);
 
-  // Detect if message looks like a human name: (e.g. "Prashant Rana", "Dr Prashant Rana")
-  const isHumanName = /^[a-zA-Z\.]+\s+[a-zA-Z]+(\s+[a-zA-Z]+)?$/.test(
-    message.trim()
-  );
-
-  const facultyKeywordHit = FACULTY_KEYWORDS.some((k) => lower.includes(k));
-
-  if (isHumanName || facultyKeywordHit) {
-    let extracted = message
-      .replace(
-        /who teaches|faculty|professor|teacher|sir|madam|hod|head of department/gi,
-        ""
-      )
-      .replace(/details of|tell me about|give info|information about/gi, "")
-      .replace(/dr\.?/gi, "")
-      .replace(/mr\.?/gi, "")
-      .replace(/ms\.?/gi, "")
-      .replace(/mrs\.?/gi, "")
+  if (facultyKeywordRegex.test(lower) || isHumanName) {
+    let extracted = trimmed
+      .replace(/\b(tell|me|about|details|of|give|info|information|for|who|is|teaches|faculty|professor|prof|teacher|sir|madam|hod|head of department|dr|mr|ms|mrs)\b\.?/gi, "")
+      .replace(/^[.\s]+/, "")
       .trim();
 
     parsed.intent = "faculty_info";
-    parsed.entities.faculty_name = extracted || message.trim();
+    parsed.entities.faculty_name = extracted || trimmed;
     return parsed;
   }
 

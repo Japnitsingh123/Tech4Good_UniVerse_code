@@ -1,1490 +1,1060 @@
-// // client/src/App.js
-// import React, { useState, useRef, useEffect } from "react";
-// import "./App.css"; // We'll create this CSS file next
-// import ReactMarkdown from "react-markdown";
-// import "leaflet/dist/leaflet.css";
-// import MapComponent from "./MapComponent";
-// import "./UserManualModal.css";
-// import UserManualModal from "./UserManualModal";
-// import { motion } from "framer-motion";
-
-// function App() {
-//   const [input, setInput] = useState("");
-//   const [messages, setMessages] = useState([
-//     {
-//       from: "bot",
-//       text: "Hello! How can I help you with campus information today?",
-//     },
-//   ]);
-//   const [isLoading, setIsLoading] = useState(false);
-//   const messagesEndRef = useRef(null);
-//   const [isModalOpen, setIsModalOpen] = useState(false);
-
-//   const scrollToBottom = () => {
-//     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-//   };
-
-//   const [isMapModalOpen, setIsMapModalOpen] = useState(false);
-//   const mapCompRef = useRef();
-
-//   const openMapModal = () => setIsMapModalOpen(true);
-//   const closeMapModal = () => {
-//     setIsMapModalOpen(false);
-//     // Stop navigation if the map component is running
-//     mapCompRef.current?.stopNavigation();
-//   };
-
-//   useEffect(() => {
-//     scrollToBottom();
-//   }, [messages]);
-
-//   const formatBotResponse = (response) => {
-//     if (!response || !response.type) {
-//       return "Received an invalid response from the server.";
-//     }
-//     if (response.type === "unknown") {
-//       return response.response; // Directly return the 'I didn't understand' message
-//     }
-//     // client/src/App.js
-
-//     if (response.type === "simple_message") {
-//       return response.response ? (
-//         // Use ReactMarkdown to render the content
-//         <div className="markdown-message">
-//           <ReactMarkdown>{response.response}</ReactMarkdown>
-//         </div>
-//       ) : (
-//         "Sorry, received an empty message."
-//       );
-//     }
-
-//     if (response.type === "subject_info" && response.data) {
-//       const item = response.data;
-//       return (
-//         <div className="subject-card">
-//           <h3 className="subject-name">
-//             {item.subjectCode} - {item.name}
-//           </h3>
-//           <div className="subject-details">
-//             <p>
-//               <strong>Credits:</strong> {item.credit}
-//             </p>
-//             <p>
-//               <strong>is core?:</strong> {item.isCore}
-//             </p>
-//           </div>
-//         </div>
-//       );
-//     }
-//     if (response.type === "dispensary_info" && response.data) {
-//       const info = response.data;
-//       return (
-//         <div className="info-card">
-//           <h3 className="info-card-title">{info.name}</h3>
-
-//           <div className="info-card-item">
-//             {/* Location Icon */}
-//             <svg
-//               xmlns="http://www.w3.org/2000/svg"
-//               viewBox="0 0 20 20"
-//               fill="currentColor"
-//             >
-//               <path
-//                 fillRule="evenodd"
-//                 d="M9.69 18.933l.003.001C9.89 19.02 10 19 10 19s.11.02.308-.066l.002-.001.006-.003.018-.008a5.741 5.741 0 00.281-.14c.186-.096.446-.24.757-.433.62-.384 1.445-.966 2.274-1.765C15.302 14.988 17 12.493 17 10A7 7 0 103 10c0 2.493 1.698 4.988 3.35 6.586.829.799 1.654 1.381 2.274 1.765.31.193.57.337.757.433.096.05.192.099.281.14l.018.008.006.003zM10 11.25a1.25 1.25 0 100-2.5 1.25 1.25 0 000 2.5z"
-//                 clipRule="evenodd"
-//               />
-//             </svg>
-//             <div>
-//               <strong>Location:</strong>
-//               <span>{info.location}</span>
-//             </div>
-//           </div>
-
-//           <div className="info-card-item">
-//             {/* Clock Icon */}
-//             <svg
-//               xmlns="http://www.w3.org/2000/svg"
-//               viewBox="0 0 20 20"
-//               fill="currentColor"
-//             >
-//               <path
-//                 fillRule="evenodd"
-//                 d="M10 18a8 8 0 100-16 8 8 0 000 16zm.75-13a.75.75 0 00-1.5 0v5c0 .414.336.75.75.75h4a.75.75 0 000-1.5H10V5z"
-//                 clipRule="evenodd"
-//               />
-//             </svg>
-//             <div>
-//               <strong>Hours:</strong>
-//               {info.hours.map((h, i) => (
-//                 <span key={i} className="hours-row">
-//                   {h.days}: {h.times}
-//                 </span>
-//               ))}
-//             </div>
-//           </div>
-
-//           <div className="info-card-item">
-//             {/* Phone Icon */}
-//             <svg
-//               xmlns="http://www.w3.org/2000/svg"
-//               viewBox="0 0 20 20"
-//               fill="currentColor"
-//             >
-//               <path
-//                 fillRule="evenodd"
-//                 d="M2 3.5A1.5 1.5 0 013.5 2h1.148a1.5 1.5 0 011.465 1.175l.716 3.223a1.5 1.5 0 01-1.052 1.767l-.23.115a.75.75 0 00-.417.82V12.5c0 .621.504 1.125 1.125 1.125H9.75v-2.125c0-.621.504-1.125 1.125-1.125h2.625c.621 0 1.125.504 1.125 1.125V12.5h.125c.621 0 1.125-.504 1.125-1.125v-1.379a.75.75 0 00-.417-.82l-.23-.115a1.5 1.5 0 01-1.052-1.767l.716-3.223A1.5 1.5 0 0115.352 2H16.5A1.5 1.5 0 0118 3.5v13a1.5 1.5 0 01-1.5 1.5h-13A1.5 1.5 0 012 16.5v-13z"
-//                 clipRule="evenodd"
-//               />
-//             </svg>
-//             <div>
-//               <strong>Phone:</strong>
-//               <span>{info.phone}</span>
-//             </div>
-//           </div>
-//         </div>
-//       );
-//     }
-//     if (response.type === "cafeteria_info" && response.data) {
-//       const info = response.data;
-//       return (
-//         <div className="cafeteria-card">
-//           <h4 className="cafeteria-title">{info.name}</h4>
-//           <div className="cafe-images">
-//             <div className="image-wrapper">
-//               <h5>Menu</h5>
-//               <img
-//                 src={info.menuImageUrl}
-//                 alt={`${info.name} Menu`}
-//                 className="chat-image"
-//                 onError={(e) => {
-//                   e.target.style.display = "none";
-//                   e.target.parentElement.insertAdjacentHTML(
-//                     "beforeend",
-//                     '<p class="image-error">Menu image not available.</p>'
-//                   );
-//                 }}
-//               />
-//             </div>
-//             <div className="image-wrapper">
-//               <h5>Scan to Pay</h5>
-//               <img
-//                 src={info.scannerImageUrl}
-//                 alt={`${info.name} Scanner`}
-//                 className="scanner-image"
-//                 onError={(e) => {
-//                   e.target.style.display = "none";
-//                   e.target.parentElement.insertAdjacentHTML(
-//                     "beforeend",
-//                     '<p class="image-error">Scanner not available.</p>'
-//                   );
-//                 }}
-//               />
-//             </div>
-//           </div>
-//         </div>
-//       );
-//     }
-//     if (response.type === "timetable_display" && response.data) {
-//       const { title, schedule } = response.data;
-//       return (
-//         <div className="timetable-container">
-//           {/* Use ReactMarkdown to render bold text in the title */}
-//           <h4 className="timetable-title">
-//             <ReactMarkdown>{title}</ReactMarkdown>
-//           </h4>
-//           <table className="timetable-table">
-//             <thead>
-//               <tr>
-//                 <th>Time</th>
-//                 <th>Subject</th>
-//                 <th>Type</th>
-//                 <th>Room</th>
-//               </tr>
-//             </thead>
-//             <tbody>
-//               {schedule.map((item, idx) => (
-//                 <tr key={idx}>
-//                   <td>{item.time}</td>
-//                   <td>{item.subject}</td>
-//                   <td>{item.type}</td>
-//                   <td>{item.room}</td>
-//                 </tr>
-//               ))}
-//             </tbody>
-//           </table>
-//         </div>
-//       );
-//     } else if (response.data && Array.isArray(response.data)) {
-//       // Handle array of data
-//       if (response.data.length === 0) {
-//         // Handle empty results
-//         if (
-//           response.type === "faculty" ||
-//           response.type === "clarification_needed"
-//         ) {
-//           return "I couldn't find any faculty members matching that name.";
-//         }
-//         if (response.type === "mess_menu") {
-//           return "No mess menu information found.";
-//         }
-//         return `No details found for ${response.type}.`;
-//       }
-//       switch (response.type) {
-//         // Inside formatBotResponse -> switch statement
-
-//         case "faculty_info": // Handles both single and multiple results now
-//           // Handle no results found by backend
-//           if (!response.data || response.data.length === 0) {
-//             return "I couldn't find any faculty members matching that name.";
-//           }
-
-//           // --- Display SINGLE faculty result as a detailed card ---
-//           if (response.data.length === 1) {
-//             const item = response.data[0];
-//             return (
-//               // Use classes assuming you added faculty card CSS
-//               <div className="faculty-card">
-//                 <h3 className="faculty-name">{item.Name}</h3>
-//                 {/* Use Specialization if available, else Department */}
-//                 <p className="faculty-department">
-//                   {item.Specialization || item.Department || "N/A"}
-//                 </p>
-//                 <div className="faculty-contact-info">
-//                   {/* FIX: Use item.Office */}
-//                   {item.Office && (
-//                     <p>
-//                       <svg
-//                         xmlns="http://www.w3.org/2000/svg"
-//                         viewBox="0 0 20 20"
-//                         fill="currentColor"
-//                         width="16"
-//                         height="16"
-//                       >
-//                         <path
-//                           fillRule="evenodd"
-//                           d="M9.293 2.293a1 1 0 011.414 0l7 7A1 1 0 0117 11v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a1 1 0 01.293-.707l7-7zM12 11a1 1 0 11-2 0 1 1 0 012 0z"
-//                           clipRule="evenodd"
-//                         />
-//                       </svg>{" "}
-//                       <span>{item.Office}</span>
-//                     </p>
-//                   )}
-//                   {/* ADD Email */}
-//                   {item.Email && (
-//                     <p>
-//                       <svg
-//                         xmlns="http://www.w3.org/2000/svg"
-//                         viewBox="0 0 20 20"
-//                         fill="currentColor"
-//                         width="16"
-//                         height="16"
-//                       >
-//                         <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
-//                         <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
-//                       </svg>{" "}
-//                       <span>{item.Email}</span>
-//                     </p>
-//                   )}
-//                 </div>
-//                 {item.link && (
-//                   <a
-//                     href={item.link}
-//                     className="faculty-profile-link"
-//                     target="_blank"
-//                     rel="noopener noreferrer"
-//                   >
-//                     {" "}
-//                     View Profile{" "}
-//                     <svg
-//                       xmlns="http://www.w3.org/2000/svg"
-//                       viewBox="0 0 20 20"
-//                       fill="currentColor"
-//                       width="14"
-//                       height="14"
-//                     >
-//                       <path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z" />
-//                       <path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z" />
-//                     </svg>{" "}
-//                   </a>
-//                 )}
-//               </div>
-//             );
-//           }
-//           // --- Display MULTIPLE faculty results (or clarification_needed/faculty_list) ---
-//           // else {
-//           //      return (
-//           //         <div>
-//           //           {/* Message depends on whether backend asked for clarification */}
-//           //           <p>{response.type === 'faculty' ? "Here are some faculty members I found:" : "I found a few people matching that name. Please choose a department or provide more details:"}</p>
-//           //           {/* You might want clarification buttons here if type is 'clarification_needed' */}
-//           //           <ul className="faculty-clarification-list">
-//           //             {response.data.map((item, idx) => (
-//           //               <li key={idx}>
-//           //                 <strong>{item.Name}</strong> ({item.Department || item.Specialization || "N/A"})
-//           //               </li>
-//           //             ))}
-//           //           </ul>
-//           //            {response.type === 'faculty' && <p>Try refining your search!</p>}
-//           //         </div>
-//           //       );
-//           // }
-//           else {
-//             // Handles faculty_list, clarification_needed, or faculty with >1 result
-//             return (
-//               <div>
-//                 {/* Updated message */}
-//                 <p className="response-title">
-//                   I found multiple faculty members matching your query:
-//                 </p>
-//                 {/* Use the faculty-grid to display multiple cards */}
-//                 <div className="faculty-grid">
-//                   {response.data.map((item) => (
-//                     // Render the full faculty card for each item
-//                     <div key={item.FacultyID} className="faculty-card">
-//                       <h3 className="faculty-name">{item.Name}</h3>
-//                       <p className="faculty-department">
-//                         {item.Specialization || item.Department || "N/A"}
-//                       </p>
-//                       <div className="faculty-contact-info">
-//                         {item.Office && (
-//                           <p>
-//                             <svg /* Office Icon */></svg>{" "}
-//                             <span>{item.Office}</span>
-//                           </p>
-//                         )}
-//                         {item.Email && (
-//                           <p>
-//                             <svg /* Email Icon */></svg>{" "}
-//                             <span>{item.Email}</span>
-//                           </p>
-//                         )}
-//                       </div>
-//                       {item.link && (
-//                         <a
-//                           href={item.link}
-//                           className="faculty-profile-link"
-//                           target="_blank"
-//                           rel="noopener noreferrer"
-//                         >
-//                           {" "}
-//                           View Profile <svg /* Link Icon */></svg>{" "}
-//                         </a>
-//                       )}
-//                     </div>
-//                   ))}
-//                 </div>
-//               </div>
-//             );
-//           }
-//         // Note: break; is not needed here since we always return
-//         case "timetable":
-//           return (
-//             <div>
-//               <p>Here's some timetable information:</p>
-//               <ul>
-//                 {response.data.map((item, idx) => (
-//                   <li key={idx}>
-//                     <strong>{item.course_name || "N/A"}</strong> -{" "}
-//                     {item.day_of_week || "N/A"}, {item.start_time || "N/A"} in{" "}
-//                     {item.location || "N/A"}
-//                   </li>
-//                 ))}
-//               </ul>
-//               <p>
-//                 Please specify a course or faculty for more detailed timetable!
-//               </p>
-//             </div>
-//           );
-//         case "mess_menu":
-//           return (
-//             <div>
-//               <p>Here's what I found for the mess menu:</p>
-//               <ul>
-//                 {response.data.map((item, idx) => (
-//                   <li key={idx}>
-//                     <strong>{item.meal_type || "N/A"}:</strong>{" "}
-//                     {item.items || "No items listed"} (Date:{" "}
-//                     {new Date(item.menu_date).toLocaleDateString() || "N/A"})
-//                   </li>
-//                 ))}
-//               </ul>
-//               <p>Please specify a meal type or date for precise info.</p>
-//             </div>
-//           );
-//         // Add cases for other types like 'cafeteria', 'navigation'
-//         case "faculty_list":
-//           // return (
-//           //   <div>
-//           //     <p>
-//           //       I found a few people with that name. Who are you looking for?
-//           //     </p>
-//           //     <ul>
-//           //       {response.data.map((item, idx) => (
-//           //         <li key={idx}>
-//           //           <strong>{item.Name}</strong>
-//           //         </li>
-//           //       ))}
-//           //     </ul>
-//           //   </div>
-//           // );
-//           return (
-//             <div>
-//               {/* Updated message */}
-//               <p className="response-title">
-//                 I found multiple faculty members matching your query:
-//               </p>
-//               {/* Use the faculty-grid to display multiple cards */}
-//               <div className="faculty-grid">
-//                 {response.data.map((item) => (
-//                   // Render the full faculty card for each item
-//                   <div key={item.FacultyID} className="faculty-card">
-//                     <h3 className="faculty-name">{item.Name}</h3>
-//                     <p className="faculty-department">
-//                       {item.Specialization || item.Department || "N/A"}
-//                     </p>
-//                     <div className="faculty-contact-info">
-//                       {item.Office && (
-//                         <p>
-//                           <svg /* Office Icon */></svg>{" "}
-//                           <span>{item.Office}</span>
-//                         </p>
-//                       )}
-//                       {item.Email && (
-//                         <p>
-//                           <svg /* Email Icon */></svg> <span>{item.Email}</span>
-//                         </p>
-//                       )}
-//                     </div>
-//                     {item.link && (
-//                       <a
-//                         href={item.link}
-//                         className="faculty-profile-link"
-//                         target="_blank"
-//                         rel="noopener noreferrer"
-//                       >
-//                         {" "}
-//                         View Profile <svg /* Link Icon */></svg>{" "}
-//                       </a>
-//                     )}
-//                   </div>
-//                 ))}
-//               </div>
-//             </div>
-//           );
-//         default:
-//           return JSON.stringify(response.data); // Fallback for other data types
-//       }
-//     } else {
-//       // If no specific data is returned, or data is empty, provide a generic message
-//       return `I found information related to ${response.type}, but no specific details could be displayed at this moment, or my database for this is empty.`;
-//     }
-//   };
-
-//   const handleSend = async (e) => {
-//     e.preventDefault(); // Prevent default form submission behavior
-//     if (!input.trim()) return;
-
-//     const userMessage = { from: "user", text: input };
-//     setMessages((prevMessages) => [...prevMessages, userMessage]);
-//     setIsLoading(true);
-//     setInput(""); // Clear input immediately
-//     const API_URL = process.env.REACT_APP_API_URL;
-
-//     try {
-//       const res = await fetch(`${API_URL}/api/chat`, {
-//         // <-- This line changed  method: "POST",
-//         method: "post",
-//         headers: { "Content-Type": "application/json" },
-//         body: JSON.stringify({ message: userMessage.text }), // Use userMessage.text here
-//       });
-
-//       const data = await res.json();
-
-//       console.log("Data received from backend:", data);
-
-//       const formattedResponse = formatBotResponse(data);
-//       const botMessage = { from: "bot", text: formattedResponse };
-//       setMessages((prevMessages) => [...prevMessages, botMessage]);
-//     } catch (err) {
-//       console.error("Error contacting backend:", err);
-//       const errorMessage = {
-//         from: "bot",
-//         text: "Sorry, I couldn't connect to the campus server. Please try again later.",
-//       };
-//       setMessages((prevMessages) => [...prevMessages, errorMessage]);
-//     } finally {
-//       setIsLoading(false);
-//     }
-//   };
-
-//   return (
-//     <div className="App">
-//       <header className="app-header">
-//         <h1>CampusGPT</h1>
-//         <p>Your AI Campus Assistant</p>
-//       </header>
-//       <div className="chat-window">
-//         <div className="message-list">
-//           {messages.map((msg, index) => (
-//             <motion.div
-//               key={index}
-//               className={`message ${msg.from}`}
-//               // These 3 lines add the animation
-//               initial={{ opacity: 0, y: 10 }}
-//               animate={{ opacity: 1, y: 0 }}
-//               transition={{ duration: 0.3 }}
-//             >
-//               <div className="message-bubble">
-//                 {typeof msg.text === "string" ? <p>{msg.text}</p> : msg.text}
-//               </div>
-//             </motion.div>
-//           ))}
-//           {isLoading && (
-//             <div className="message bot">
-//             <div className="message-bubble">
-//               <div className="skeleton-bubble"></div> {/* Our new loader */}
-//             </div>
-//           </div>
-//           )}
-//           <div ref={messagesEndRef} />
-//         </div>
-//         <form onSubmit={handleSend} className="input-bar">
-//           <input
-//             type="text"
-//             value={input}
-//             onChange={(e) => setInput(e.target.value)}
-//             placeholder={isLoading ? "Bot is typing..." : "Ask something..."}
-//             disabled={isLoading}
-//           />
-//           <button
-//             className="user-manual-button"
-//             onClick={() => setIsModalOpen(true)}
-//             type="button" // Good practice to prevent form submission if it's inside a form
-//           >
-//             ℹ️ Guide
-//           </button>
-//           <button
-//             type="button" // Important: not 'submit'
-//             onClick={openMapModal} // Open the modal
-//             className="nav-button"
-//             title="Open Campus Map"
-//           >
-//             <svg
-//               xmlns="http://www.w3.org/2000/svg"
-//               width="20"
-//               height="20"
-//               viewBox="0 0 24 24"
-//               strokeWidth="2"
-//               strokeLinecap="round"
-//               strokeLinejoin="round"
-//             >
-//               <circle cx="12" cy="12" r="10"></circle>
-//               <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon>
-//               <circle cx="12" cy="12" r="3"></circle>
-//             </svg>
-//           </button>
-//           <button type="submit" disabled={isLoading}>
-//             Send
-//           </button>
-//         </form>
-//       </div>
-//       {isMapModalOpen && (
-//         <div className="map-modal-overlay" onClick={closeMapModal}>
-//           <div
-//             className="map-modal-content"
-//             onClick={(e) => e.stopPropagation()}
-//           >
-//             {/* Render the Map Component */}
-//             <MapComponent isVisible={isMapModalOpen} ref={mapCompRef} />
-//             <button
-//               onClick={closeMapModal}
-//               className="close-modal-button"
-//               aria-label="Close map"
-//             >
-//               &times;
-//             </button>
-//           </div>
-//         </div>
-//       )}
-//       {isModalOpen && <UserManualModal onClose={() => setIsModalOpen(false)} />}
-//     </div>
-//   );
-// }
-
-// export default App;
-
-// src/App.js
-import React, { useState, useRef, useEffect } from "react";
-import "./App.css"; // We will replace this file next
+import React, { useState, useRef, useEffect, useMemo } from "react";
+import "./App.css";
 import ReactMarkdown from "react-markdown";
-import Sidebar from "./components/Sidebar"; // <-- IMPORT THE NEW SIDEBAR
 import "leaflet/dist/leaflet.css";
 import MapComponent from "./MapComponent";
 import "./UserManualModal.css";
 import UserManualModal from "./UserManualModal";
+import Sidebar from "./components/Sidebar";
+import {
+  FaRobot,
+  FaPaperPlane,
+  FaMapMarkedAlt,
+  FaUniversity,
+  FaChalkboardTeacher,
+  FaCalendarAlt,
+  FaUtensils,
+  FaInfoCircle,
+  FaSearch,
+  FaRegCopy,
+  FaCheck,
+  FaTrashAlt,
+  FaPhoneAlt,
+  FaMapMarkerAlt,
+  FaClock,
+  FaEnvelope,
+  FaExternalLinkAlt,
+  FaQrcode,
+  FaTimes,
+  FaBook,
+  FaFileAlt,
+  FaUserGraduate,
+  FaChevronRight,
+  FaHospitalAlt
+} from "react-icons/fa";
 
-// --- ALL YOUR EXISTING HELPER FUNCTIONS ---
-// (We just move them outside the App component or keep them inside)
+// Embedded data for instant dedicated tab browsing
+const ALL_FACULTY = [
+  {
+    FacultyID: 1,
+    Name: "Dr. Raj Kumar Gupta",
+    Department: "Computer Science & Engineering",
+    Specialization: "Distributed Systems, Cloud Computing, HPC",
+    Office: "A-211 CSED",
+    Email: "rkgupta@thapar.edu",
+    link: "https://med.thapar.edu/faculty"
+  },
+  {
+    FacultyID: 2,
+    Name: "Dr. Prashant Singh Rana",
+    Department: "Computer Science & Engineering",
+    Specialization: "Machine Learning, Deep Learning, AI",
+    Office: "B-105 CSED",
+    Email: "psrana@thapar.edu",
+    link: "https://med.thapar.edu/faculty"
+  },
+  {
+    FacultyID: 3,
+    Name: "Dr. S.S. Bhatia",
+    Department: "School of Mathematics",
+    Specialization: "Pure & Applied Mathematics, Functional Analysis",
+    Office: "D-302 Mathematics Block",
+    Email: "ssbhatia@thapar.edu",
+    link: "https://som.thapar.edu/faculty"
+  },
+  {
+    FacultyID: 4,
+    Name: "Dr. Seema Bawa",
+    Department: "Computer Science & Engineering",
+    Specialization: "Software Engineering, Cloud Computing",
+    Office: "A-201 CSED",
+    Email: "seema@thapar.edu",
+    link: "https://med.thapar.edu/faculty"
+  },
+  {
+    FacultyID: 5,
+    Name: "Dr. Maninder Singh",
+    Department: "Computer Science & Engineering",
+    Specialization: "Cyber Security, Network Vulnerability",
+    Office: "A-205 CSED",
+    Email: "msingh@thapar.edu",
+    link: "https://med.thapar.edu/faculty"
+  },
+  {
+    FacultyID: 6,
+    Name: "Dr. Rajesh Kumar",
+    Department: "Electrical & Instrumentation Engineering",
+    Specialization: "Power Systems, Renewable Energy, Smart Grids",
+    Office: "E-101 EIED",
+    Email: "rkumar@thapar.edu",
+    link: "https://eied.thapar.edu/faculty"
+  },
+  {
+    FacultyID: 7,
+    Name: "Dr. Inderveer Chhabra",
+    Department: "Computer Science & Engineering",
+    Specialization: "Natural Language Processing, IR",
+    Office: "B-204 CSED",
+    Email: "inderveer@thapar.edu",
+    link: "https://med.thapar.edu/faculty"
+  },
+  {
+    FacultyID: 8,
+    Name: "Dr. Neeraj Kumar",
+    Department: "Computer Science & Engineering",
+    Specialization: "IoT, Mobile Cloud, Security",
+    Office: "A-208 CSED",
+    Email: "neeraj.kumar@thapar.edu",
+    link: "https://med.thapar.edu/faculty"
+  },
+  {
+    FacultyID: 9,
+    Name: "Dr. Sharad Saxena",
+    Department: "Computer Science & Engineering",
+    Specialization: "Image Processing, Pattern Recognition",
+    Office: "B-108 CSED",
+    Email: "sharad.saxena@thapar.edu",
+    link: "https://med.thapar.edu/faculty"
+  },
+  {
+    FacultyID: 10,
+    Name: "Dr. Anju Bala",
+    Department: "Computer Science & Engineering",
+    Specialization: "Cloud Computing, Big Data, Green Computing",
+    Office: "B-202 CSED",
+    Email: "anju.bala@thapar.edu",
+    link: "https://med.thapar.edu/faculty"
+  }
+];
+
+const ALL_CAFES = [
+  {
+    id: 1,
+    name: "Pizza Nation",
+    category: "Fast Food & Pizza",
+    timing: "10:00 AM - 11:00 PM",
+    menuImageUrl: "https://i.ibb.co/LzWrk0NY/pizza-Nation-menu.jpg",
+    scannerImageUrl: "https://i.ibb.co/JFHbQHtX/pizza-Nation-scanner.jpg"
+  },
+  {
+    id: 2,
+    name: "Dessert Club",
+    category: "Ice Cream, Waffles & Shakes",
+    timing: "11:00 AM - 11:30 PM",
+    menuImageUrl: "https://i.ibb.co/4ZHyv39Y/dessert-Club-menu.jpg",
+    scannerImageUrl: "https://i.ibb.co/sp2kWRgN/dessert-Club-scanner.jpg"
+  },
+  {
+    id: 3,
+    name: "Chilli Chitkara",
+    category: "Chinese & Asian Fast Food",
+    timing: "10:30 AM - 10:30 PM",
+    menuImageUrl: "https://i.ibb.co/xqPNmDy1/chilli-Chitkara-menu.jpg",
+    scannerImageUrl: ""
+  },
+  {
+    id: 4,
+    name: "G-Block Canteen",
+    category: "North Indian, Thali & Snacks",
+    timing: "8:00 AM - 10:00 PM",
+    menuImageUrl: "https://i.ibb.co/S4d8Px6b/GBlock-Canteen-menu.jpg",
+    scannerImageUrl: ""
+  },
+  {
+    id: 5,
+    name: "Jaggi Samosa Shop",
+    category: "Traditional Samosa & Snacks",
+    timing: "9:00 AM - 9:00 PM",
+    menuImageUrl: "https://i.ibb.co/tMXZhL4b/Jaggi-Samosa-menu.jpg",
+    scannerImageUrl: "https://i.ibb.co/d4D6LQC1/jaggi-Samosa-scanner.jpg"
+  },
+  {
+    id: 6,
+    name: "Jaggi Juice & Shakes",
+    category: "Fresh Fruit Juices & Shakes",
+    timing: "8:30 AM - 10:30 PM",
+    menuImageUrl: "https://i.ibb.co/27KVvyws/jaggi-Juice-menu.jpg",
+    scannerImageUrl: "https://i.ibb.co/d0G2MQbQ/jaggi-Juice-scanner.jpg"
+  },
+  {
+    id: 7,
+    name: "Nescafe Outlet",
+    category: "Hot & Cold Coffee, Maggi, Snacks",
+    timing: "8:00 AM - 11:00 PM",
+    menuImageUrl: "https://i.ibb.co/WNqDTVPJ/Nescafe-menu.jpg",
+    scannerImageUrl: "https://i.ibb.co/GvkkgVrQ/Nescafe-scannar.jpg"
+  },
+  {
+    id: 8,
+    name: "Campus Bite",
+    category: "Burgers, Sandwiches & Rolls",
+    timing: "10:00 AM - 10:00 PM",
+    menuImageUrl: "https://i.ibb.co/HWWtx26/Campusbite-menu.jpg",
+    scannerImageUrl: "https://i.ibb.co/Swwh301L/Campusbite-scanner.jpg"
+  },
+  {
+    id: 9,
+    name: "Amritsari Naan & Kulcha",
+    category: "Amritsari Kulche, Chole & Lassi",
+    timing: "9:00 AM - 9:30 PM",
+    menuImageUrl: "https://i.ibb.co/23ZLKsgv/Amritsari-kulcha-naan-Menu.jpg",
+    scannerImageUrl: "https://i.ibb.co/q3KYXHP0/Amritsari-kulcha-naan-scannar.jpg"
+  },
+  {
+    id: 10,
+    name: "Jaggi Cold Coffee",
+    category: "Special Cold Coffee & Ice Cream",
+    timing: "10:00 AM - 11:00 PM",
+    menuImageUrl: "https://i.ibb.co/mrLnpShQ/Jaggi-cold-coffee-menu.jpg",
+    scannerImageUrl: "https://i.ibb.co/wFsdcDGG/Jaggi-cold-coffee-scanner.jpg"
+  }
+];
+
+const ALL_DOAA_PROCEDURES = [
+  {
+    id: 1,
+    task: "Group / Sub-group Change",
+    summary: "Switch assigned class group or tutorial/practical sub-group.",
+    steps: "1. Write a formal application stating reason.\n2. Mention current group and requested target group.\n3. Obtain approval from DoAA Office.\n4. Submit approved form to WebKiosk/SSSP Admin (Dr. SK Guleria / Mr. Vinod Kumar - 1st Floor, Near Registrar Office)."
+  },
+  {
+    id: 2,
+    task: "Add Additional Subject / Backlog Registration",
+    summary: "Register for an extra course or clear a previous backlog.",
+    steps: "1. Fill the Add/Backlog form floated before semester start.\n2. Draft your current weekly schedule ensuring no slot clashes.\n3. Get verification from Departmental Timetable Coordinator ('No Clashes').\n4. Pay applicable fee and submit approved form to Academic Section."
+  },
+  {
+    id: 3,
+    task: "Drop Subject",
+    summary: "Withdraw or drop an registered course within the allowed add/drop window.",
+    steps: "1. Use official Add/Drop form during open window.\n2. State course details and obtain DoAA approval.\n3. Submit to Academic Section for portal update."
+  },
+  {
+    id: 4,
+    task: "Free / Generic / Professional Elective Change",
+    summary: "Modify elective choice or rectify missed choice filling.",
+    steps: "1. Check available elective vacancies on WebKiosk.\n2. For changes: Write application to HoD/DoAA.\n3. Submit signed approval to WebKiosk Admin (Mr. Rupinder Singh)."
+  },
+  {
+    id: 5,
+    task: "Fee Related Concerns & Delayed Payment",
+    summary: "Apply for fee payment extension due to education loan or genuine difficulty.",
+    steps: "1. Draft application with supporting proofs (loan letter, medical cert).\n2. Obtain approval from DoAA Office for extension.\n3. Submit approved form to Finance Section (Mr. Pankaj Sinha)."
+  },
+  {
+    id: 6,
+    task: "Make-up Test for Missed MST",
+    summary: "Apply for compensatory mid-semester test on medical or genuine grounds.",
+    steps: "1. Obtain Medical/Genuine Reason Certificate within 3 days of missed test.\n2. Submit formal application to DoAA with hospital/Dispensary slip.\n3. Coordinate with respective Course Coordinator once approved."
+  }
+];
+
+const QUICK_ACTIONS = [
+  { label: "2C24 Schedule", query: "what is the timetable for 2C24?" },
+  { label: "1A11 Timetable", query: "1A11 timetable for Tuesday" },
+  { label: "Pizza Nation Menu", query: "pizza nation menu" },
+  { label: "UCS312 DBMS", query: "tell me about UCS312" },
+  { label: "Change Group", query: "how to change group" },
+  { label: "Drop Subject", query: "how to drop subject" },
+  { label: "Missed MST Makeup", query: "makeup test for missed mst" },
+  { label: "Dr. Raj Kumar Gupta", query: "Dr. Raj Kumar Gupta" },
+  { label: "Dispensary Timings", query: "dispensary timing" }
+];
 
 function App() {
-  // --- STATE ---
-  // NEW state to manage which tab is active
-  const [activeTab, setActiveTab] = useState("chat"); // Default to 'chat'
-
-  // All your existing states
+  const [activeTab, setActiveTab] = useState("chat");
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState([
     {
       from: "bot",
-      text: "Hello! How can I help you with campus information today?",
+      type: "simple_message",
+      text: "👋 **Welcome to UniVerse Campus Assistant!**\n\nI can assist you with:\n• 📅 **Timetables & Class Schedules** (e.g. *'2C24 schedule'*)\n• 🍔 **Cafeteria Menus & QR Codes** (e.g. *'Pizza Nation menu'*)\n• 📚 **Course Syllabi & Credits** (e.g. *'UCS312'*)\n• 🏛️ **DoAA Academic Procedures & Forms**\n• 👨‍🏫 **Faculty Directory & Contacts**\n• 🏥 **Dispensary & Campus Navigation**\n\nClick any quick suggestion below or ask me anything!",
     },
   ]);
   const [isLoading, setIsLoading] = useState(false);
-  const messagesEndRef = useRef(null);
+  const [copiedIndex, setCopiedIndex] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isMapModalOpen, setIsMapModalOpen] = useState(false);
-  const [fullScreenImage, setFullScreenImage] = useState(null); // For menu
-  const mapCompRef = useRef();
+  const [fullScreenImage, setFullScreenImage] = useState(null);
 
-  // --- ALL YOUR EXISTING FUNCTIONS ---
+  // Tab State
+  const [facultySearch, setFacultySearch] = useState("");
+  const [cafeSearch, setCafeSearch] = useState("");
+  const [doaaSearch, setDoaaSearch] = useState("");
+  const [selectedBatch, setSelectedBatch] = useState("2C24");
+  const [selectedDay, setSelectedDay] = useState("Monday");
+  const [batchSchedule, setBatchSchedule] = useState(null);
+  const [batchLoading, setBatchLoading] = useState(false);
+
+  const messagesEndRef = useRef(null);
+  const mapCompRef = useRef(null);
+
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
-  const openMapModal = () => setIsMapModalOpen(true);
-  const closeMapModal = () => {
-    setIsMapModalOpen(false);
-    mapCompRef.current?.stopNavigation();
-  };
-
-  // src/App.js
-
-// --- HARDCODED CAFETERIA DATA ---
-const cafeteriaData = [
-  {
-    name: "Pizza Nation",
-    keywords: ["pizza", "pizza nation", "nation", "menu"],
-    menuImageUrl: "https://i.ibb.co/LzWrk0NY/pizza-Nation-menu.jpg", // <-- REPLACE
-    scannerImageUrl: "https://i.ibb.co/JFHbQHtX/pizza-Nation-scanner.jpg", // <-- REPLACE
-  },
-  {
-    name: "Dessert Club Menu",
-    keywords: ["dessert", "dessert club"],
-    menuImageUrl: "https://i.ibb.co/4ZHyv39Y/dessert-Club-menu.jpg", // <-- REPLACE
-    scannerImageUrl: "https://i.ibb.co/sp2kWRgN/dessert-Club-scanner.jpg", // <-- REPLACE
-  },
-  {
-    name: "Chilli Chitkara",
-    keywords: ["chilli", "chilli chitkara", "chitkara"],
-    menuImageUrl: "https://i.ibb.co/xqPNmDy1/chilli-Chitkara-menu.jpg", // <-- REPLACE
-    scannerImageUrl: "aksgf", // <-- REPLACE
-  },
-  {
-    name: "G-Block",
-    keywords: ["g block", "g-block"],
-    menuImageUrl: "https://i.ibb.co/S4d8Px6b/GBlock-Canteen-menu.jpg", // <-- REPLACE
-    scannerImageUrl: "kahsgf", // <-- REPLACE
-  },
-  {
-    name: "Jaggi Samosa Shop",
-    keywords: ["samosa", "jaggi samosa", "royal bite"],
-    menuImageUrl: "https://i.ibb.co/tMXZhL4b/Jaggi-Samosa-menu.jpg", // <-- REPLACE
-    scannerImageUrl: "https://i.ibb.co/d4D6LQC1/jaggi-Samosa-scanner.jpg", // <-- REPLACE
-  },
-  {
-    name: "Jaggi Juice Shop",
-    keywords: [
-      "juice",
-      "jaggi juice",
-      "jeona khan",
-      "juice",
-      "fruit",
-      "fruits",
-    ],
-    menuImageUrl: "https://i.ibb.co/27KVvyws/jaggi-Juice-menu.jpg", // <-- REPLACE
-    scannerImageUrl: "https://i.ibb.co/d0G2MQbQ/jaggi-Juice-scanner.jpg", // <-- REPLACE
-  },
-  {
-    name: "Sips and bite",
-    keywords: ["sips", "sips and bite", "sip and bite"],
-    menuImageUrl: "https://i.ibb.co/5fv8Tz3/sips-And-Bites-menu.jpg", // <-- REPLACE
-    scannerImageUrl: "kjsdf", // <-- REPLACE
-  },
-  {
-    name: "Cos All Shops",
-    keywords: ["cos", "cos shops", "cos info", "shop", "shops"],
-    menuImageUrl: "https://i.ibb.co/DDJgvTm3/cos.jpg", // <-- REPLACE
-    scannerImageUrl: "kjsdf", // <-- REPLACE
-  },
-  
-  {
-    name: "Nascafe",
-    keywords: ["Nescafe Menu", "Nescafe", "nescafe"],
-    menuImageUrl: "https://i.ibb.co/WNqDTVPJ/Nescafe-menu.jpg", // <-- REPLACE
-    scannerImageUrl: "https://i.ibb.co/GvkkgVrQ/Nescafe-scannar.jpg",
-  },
-  {
-    name: "Campus Bite",
-    keywords: ["Campus bite", "bite", "campusbite"],
-    menuImageUrl: "https://i.ibb.co/HWWtx26/Campusbite-menu.jpg", // <-- REPLACE
-    scannerImageUrl: "https://i.ibb.co/Swwh301L/Campusbite-scanner.jpg",
-  },
-  {
-    name: "Amritsari Naan",
-    keywords: ["Amritsari", "Naan", "amritsari naan"],
-    menuImageUrl: "https://i.ibb.co/23ZLKsgv/Amritsari-kulcha-naan-Menu.jpg", // <-- REPLACE
-    scannerImageUrl:
-      "https://i.ibb.co/q3KYXHP0/Amritsari-kulcha-naan-scannar.jpg",
-  },
-  {
-    name: "Jaggi Cold Coffee",
-    keywords: ["Jaggi", "cold coffee", "Surinder ice cream parlour and shakes"],
-    menuImageUrl: "https://i.ibb.co/mrLnpShQ/Jaggi-cold-coffee-menu.jpg", // <-- REPLACE
-    scannerImageUrl: "https://i.ibb.co/wFsdcDGG/Jaggi-cold-coffee-scanner.jpg",
-  },
-  {
-    name: "TSLAS Back Canteen",
-    keywords: ["tslas canteen", "tslas back", "near tslas"],
-    menuImageUrl: "https://i.ibb.co/B5zp13Wk/Taslas-Backside-menu.jpg", // <-- REPLACE
-    scannerImageUrl: "kjsdf", // <-- REPLACE
-  },
-];
-// -------------------------------
-
-  // ... your App component code ...
-
   useEffect(() => {
-    // Only scroll to bottom if we are on the chat tab
-    if (activeTab === "chat") {
-      scrollToBottom();
-    }
-  }, [messages, activeTab]);
+    scrollToBottom();
+  }, [messages, isLoading]);
 
-  // --- PASTE YOUR ENTIRE `formatBotResponse` FUNCTION HERE ---
-  const formatBotResponse = (response) => {
-    if (!response || !response.type) {
-      return "Received an invalid response from the server.";
-    }
-    if (response.type === "unknown") {
-      return response.response; // Directly return the 'I didn't understand' message
-    }
-    // client/src/App.js
+  const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5001";
 
-    if (response.type === "simple_message") {
-      return response.response ? (
-        // Use ReactMarkdown to render the content
-        <div className="markdown-message">
-          <ReactMarkdown>{response.response}</ReactMarkdown>
-        </div>
-      ) : (
-        "Sorry, received an empty message."
-      );
+  // Fetch batch timetable when batch or day changes in Timetable tab
+  useEffect(() => {
+    if (activeTab === "timetable") {
+      fetchTimetableTab(selectedBatch, selectedDay);
     }
+  }, [selectedBatch, selectedDay, activeTab]);
 
-    if (response.type === "subject_info" && response.data) {
-      const item = response.data;
-      return (
-        <div className="subject-card">
-          <h3 className="subject-name">
-            {item.subjectCode} - {item.name}
-          </h3>
-          <div className="subject-details">
-            <p>
-              <strong>Credits:</strong> {item.credit}
-            </p>
-            <p>
-              <strong>is core?:</strong> {item.isCore}
-            </p>
-          </div>
-        </div>
-      );
-    }
-    if (response.type === "dispensary_info" && response.data) {
-      const info = response.data;
-      return (
-        <div className="info-card">
-          <h3 className="info-card-title">{info.name}</h3>
-
-          <div className="info-card-item">
-            {/* Location Icon */}
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-            >
-              <path
-                fillRule="evenodd"
-                d="M9.69 18.933l.003.001C9.89 19.02 10 19 10 19s.11.02.308-.066l.002-.001.006-.003.018-.008a5.741 5.741 0 00.281-.14c.186-.096.446-.24.757-.433.62-.384 1.445-.966 2.274-1.765C15.302 14.988 17 12.493 17 10A7 7 0 103 10c0 2.493 1.698 4.988 3.35 6.586.829.799 1.654 1.381 2.274 1.765.31.193.57.337.757.433.096.05.192.099.281.14l.018.008.006.003zM10 11.25a1.25 1.25 0 100-2.5 1.25 1.25 0 000 2.5z"
-                clipRule="evenodd"
-              />
-            </svg>
-            <div>
-              <strong>Location:</strong>
-              <span>{info.location}</span>
-            </div>
-          </div>
-
-          <div className="info-card-item">
-            {/* Clock Icon */}
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-            >
-              <path
-                fillRule="evenodd"
-                d="M10 18a8 8 0 100-16 8 8 0 000 16zm.75-13a.75.75 0 00-1.5 0v5c0 .414.336.75.75.75h4a.75.75 0 000-1.5H10V5z"
-                clipRule="evenodd"
-              />
-            </svg>
-            <div>
-              <strong>Hours:</strong>
-              {info.hours.map((h, i) => (
-                <span key={i} className="hours-row">
-                  {h.days}: {h.times}
-                </span>
-              ))}
-            </div>
-          </div>
-
-          <div className="info-card-item">
-            {/* Phone Icon */}
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-            >
-              <path
-                fillRule="evenodd"
-                d="M2 3.5A1.5 1.5 0 013.5 2h1.148a1.5 1.5 0 011.465 1.175l.716 3.223a1.5 1.5 0 01-1.052 1.767l-.23.115a.75.75 0 00-.417.82V12.5c0 .621.504 1.125 1.125 1.125H9.75v-2.125c0-.621.504-1.125 1.125-1.125h2.625c.621 0 1.125.504 1.125 1.125V12.5h.125c.621 0 1.125-.504 1.125-1.125v-1.379a.75.75 0 00-.417-.82l-.23-.115a1.5 1.5 0 01-1.052-1.767l.716-3.223A1.5 1.5 0 0115.352 2H16.5A1.5 1.5 0 0118 3.5v13a1.5 1.5 0 01-1.5 1.5h-13A1.5 1.5 0 012 16.5v-13z"
-                clipRule="evenodd"
-              />
-            </svg>
-            <div>
-              <strong>Phone:</strong>
-              <span>{info.phone}</span>
-            </div>
-          </div>
-        </div>
-      );
-    }
-    if (response.type === "cafeteria_info" && response.data) {
-      const info = response.data;
-      return (
-        <div className="cafeteria-card">
-          <h4 className="cafeteria-title">{info.name}</h4>
-          <div className="cafe-images">
-            <div className="image-wrapper">
-              <h5>Menu</h5>
-              <img
-                src={info.menuImageUrl}
-                alt={`${info.name} Menu`}
-                className="chat-image"
-                onError={(e) => {
-                  e.target.style.display = "none";
-                  e.target.parentElement.insertAdjacentHTML(
-                    "beforeend",
-                    '<p class="image-error">Menu image not available.</p>'
-                  );
-                }}
-              />
-            </div>
-            <div className="image-wrapper">
-              <h5>Scan to Pay</h5>
-              <img
-                src={info.scannerImageUrl}
-                alt={`${info.name} Scanner`}
-                className="scanner-image"
-                onError={(e) => {
-                  e.target.style.display = "none";
-                  e.target.parentElement.insertAdjacentHTML(
-                    "beforeend",
-                    '<p class="image-error">Scanner not available.</p>'
-                  );
-                }}
-              />
-            </div>
-          </div>
-        </div>
-      );
-    }
-    if (response.type === "timetable_display" && response.data) {
-      const { title, schedule } = response.data;
-      return (
-        <div className="timetable-container">
-          {/* Use ReactMarkdown to render bold text in the title */}
-          <h4 className="timetable-title">
-            <ReactMarkdown>{title}</ReactMarkdown>
-          </h4>
-          <table className="timetable-table">
-            <thead>
-              <tr>
-                <th>Time</th>
-                <th>Subject</th>
-                <th>Type</th>
-                <th>Room</th>
-              </tr>
-            </thead>
-            <tbody>
-              {schedule.map((item, idx) => (
-                <tr key={idx}>
-                  <td>{item.time}</td>
-                  <td>{item.subject}</td>
-                  <td>{item.type}</td>
-                  <td>{item.room}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      );
-    } else if (response.data && Array.isArray(response.data)) {
-      // Handle array of data
-      if (response.data.length === 0) {
-        // Handle empty results
-        if (
-          response.type === "faculty" ||
-          response.type === "clarification_needed"
-        ) {
-          return "I couldn't find any faculty members matching that name.";
-        }
-        if (response.type === "mess_menu") {
-          return "No mess menu information found.";
-        }
-        return `No details found for ${response.type}.`;
+  const fetchTimetableTab = async (batch, day) => {
+    setBatchLoading(true);
+    try {
+      const res = await fetch(`${API_URL}/api/chat`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: `${batch} timetable ${day}` }),
+      });
+      const data = await res.json();
+      if (data.type === "timetable_display" && data.data) {
+        setBatchSchedule(data.data);
+      } else {
+        setBatchSchedule({ title: `Schedule for ${batch}`, schedule: [] });
       }
-      switch (response.type) {
-        // Inside formatBotResponse -> switch statement
-
-        case "faculty_info": // Handles both single and multiple results now
-          // Handle no results found by backend
-          if (!response.data || response.data.length === 0) {
-            return "I couldn't find any faculty members matching that name.";
-          }
-
-          // --- Display SINGLE faculty result as a detailed card ---
-          if (response.data.length === 1) {
-            const item = response.data[0];
-            return (
-              // Use classes assuming you added faculty card CSS
-              <div className="faculty-card">
-                <h3 className="faculty-name">{item.Name}</h3>
-                {/* Use Specialization if available, else Department */}
-                <p className="faculty-department">
-                  {item.Specialization || item.Department || "N/A"}
-                </p>
-                <div className="faculty-contact-info">
-                  {/* FIX: Use item.Office */}
-                  {item.Office && (
-                    <p>
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 20 20"
-                        fill="currentColor"
-                        width="16"
-                        height="16"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M9.293 2.293a1 1 0 011.414 0l7 7A1 1 0 0117 11v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a1 1 0 01.293-.707l7-7zM12 11a1 1 0 11-2 0 1 1 0 012 0z"
-                          clipRule="evenodd"
-                        />
-                      </svg>{" "}
-                      <span>{item.Office}</span>
-                    </p>
-                  )}
-                  {/* ADD Email */}
-                  {item.Email && (
-                    <p>
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 20 20"
-                        fill="currentColor"
-                        width="16"
-                        height="16"
-                      >
-                        <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
-                        <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
-                      </svg>{" "}
-                      <span>{item.Email}</span>
-                    </p>
-                  )}
-                </div>
-                {item.link && (
-                  <a
-                    href={item.link}
-                    className="faculty-profile-link"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    {" "}
-                    View Profile{" "}
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 20 20"
-                      fill="currentColor"
-                      width="14"
-                      height="14"
-                    >
-                      <path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z" />
-                      <path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z" />
-                    </svg>{" "}
-                  </a>
-                )}
-              </div>
-            );
-          }
-          // --- Display MULTIPLE faculty results (or clarification_needed/faculty_list) ---
-          // else {
-          //      return (
-          //         <div>
-          //           {/* Message depends on whether backend asked for clarification */}
-          //           <p>{response.type === 'faculty' ? "Here are some faculty members I found:" : "I found a few people matching that name. Please choose a department or provide more details:"}</p>
-          //           {/* You might want clarification buttons here if type is 'clarification_needed' */}
-          //           <ul className="faculty-clarification-list">
-          //             {response.data.map((item, idx) => (
-          //               <li key={idx}>
-          //                 <strong>{item.Name}</strong> ({item.Department || item.Specialization || "N/A"})
-          //               </li>
-          //             ))}
-          //           </ul>
-          //            {response.type === 'faculty' && <p>Try refining your search!</p>}
-          //         </div>
-          //       );
-          // }
-          else {
-            // Handles faculty_list, clarification_needed, or faculty with >1 result
-            return (
-              <div>
-                {/* Updated message */}
-                <p className="response-title">
-                  I found multiple faculty members matching your query:
-                </p>
-                {/* Use the faculty-grid to display multiple cards */}
-                <div className="faculty-grid">
-                  {response.data.map((item) => (
-                    // Render the full faculty card for each item
-                    <div key={item.FacultyID} className="faculty-card">
-                      <h3 className="faculty-name">{item.Name}</h3>
-                      <p className="faculty-department">
-                        {item.Specialization || item.Department || "N/A"}
-                      </p>
-                      <div className="faculty-contact-info">
-                        {item.Office && (
-                          <p>
-                            <svg /* Office Icon */></svg>{" "}
-                            <span>{item.Office}</span>
-                          </p>
-                        )}
-                        {item.Email && (
-                          <p>
-                            <svg /* Email Icon */></svg>{" "}
-                            <span>{item.Email}</span>
-                          </p>
-                        )}
-                      </div>
-                      {item.link && (
-                        <a
-                          href={item.link}
-                          className="faculty-profile-link"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        >
-                          {" "}
-                          View Profile <svg /* Link Icon */></svg>{" "}
-                        </a>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            );
-          }
-        // Note: break; is not needed here since we always return
-        case "timetable":
-          return (
-            <div>
-              <p>Here's some timetable information:</p>
-              <ul>
-                {response.data.map((item, idx) => (
-                  <li key={idx}>
-                    <strong>{item.course_name || "N/A"}</strong> -{" "}
-                    {item.day_of_week || "N/A"}, {item.start_time || "N/A"} in{" "}
-                    {item.location || "N/A"}
-                  </li>
-                ))}
-              </ul>
-              <p>
-                Please specify a course or faculty for more detailed timetable!
-              </p>
-            </div>
-          );
-        case "mess_menu":
-          return (
-            <div>
-              <p>Here's what I found for the mess menu:</p>
-              <ul>
-                {response.data.map((item, idx) => (
-                  <li key={idx}>
-                    <strong>{item.meal_type || "N/A"}:</strong>{" "}
-                    {item.items || "No items listed"} (Date:{" "}
-                    {new Date(item.menu_date).toLocaleDateString() || "N/A"})
-                  </li>
-                ))}
-              </ul>
-              <p>Please specify a meal type or date for precise info.</p>
-            </div>
-          );
-        // Add cases for other types like 'cafeteria', 'navigation'
-        case "faculty_list":
-          // return (
-          //   <div>
-          //     <p>
-          //       I found a few people with that name. Who are you looking for?
-          //     </p>
-          //     <ul>
-          //       {response.data.map((item, idx) => (
-          //         <li key={idx}>
-          //           <strong>{item.Name}</strong>
-          //         </li>
-          //       ))}
-          //     </ul>
-          //   </div>
-          // );
-          return (
-            <div>
-              {/* Updated message */}
-              <p className="response-title">
-                I found multiple faculty members matching your query:
-              </p>
-              {/* Use the faculty-grid to display multiple cards */}
-              <div className="faculty-grid">
-                {response.data.map((item) => (
-                  // Render the full faculty card for each item
-                  <div key={item.FacultyID} className="faculty-card">
-                    <h3 className="faculty-name">{item.Name}</h3>
-                    <p className="faculty-department">
-                      {item.Specialization || item.Department || "N/A"}
-                    </p>
-                    <div className="faculty-contact-info">
-                      {item.Office && (
-                        <p>
-                          <svg /* Office Icon */></svg>{" "}
-                          <span>{item.Office}</span>
-                        </p>
-                      )}
-                      {item.Email && (
-                        <p>
-                          <svg /* Email Icon */></svg> <span>{item.Email}</span>
-                        </p>
-                      )}
-                    </div>
-                    {item.link && (
-                      <a
-                        href={item.link}
-                        className="faculty-profile-link"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        {" "}
-                        View Profile <svg /* Link Icon */></svg>{" "}
-                      </a>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
-          );
-        default:
-          return JSON.stringify(response.data); // Fallback for other data types
-      }
-    } else {
-      // If no specific data is returned, or data is empty, provide a generic message
-      return `I found information related to ${response.type}, but no specific details could be displayed at this moment, or my database for this is empty.`;
+    } catch (e) {
+      setBatchSchedule(null);
+    } finally {
+      setBatchLoading(false);
     }
   };
 
-  // --- PASTE YOUR ENTIRE `handleSend` FUNCTION HERE ---
-  const handleSend = async (e) => {
-    e.preventDefault(); // Prevent default form submission behavior
-    if (!input.trim()) return;
+  const handleSendMessage = async (textToSend) => {
+    const text = (textToSend || input).trim();
+    if (!text) return;
 
-    const userMessage = { from: "user", text: input };
-    setMessages((prevMessages) => [...prevMessages, userMessage]);
+    const userMessage = { from: "user", text: text };
+    setMessages((prev) => [...prev, userMessage]);
+    setInput("");
     setIsLoading(true);
-    setInput(""); // Clear input immediately
-    const API_URL = process.env.REACT_APP_API_URL;
 
     try {
       const res = await fetch(`${API_URL}/api/chat`, {
-        // <-- This line changed  method: "POST",
-        method: "post",
+        method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: userMessage.text }), // Use userMessage.text here
+        body: JSON.stringify({ message: text }),
       });
-
       const data = await res.json();
-
-      console.log("Data received from backend:", data);
-
-      const formattedResponse = formatBotResponse(data);
-      const botMessage = { from: "bot", text: formattedResponse };
-      setMessages((prevMessages) => [...prevMessages, botMessage]);
+      setMessages((prev) => [...prev, { from: "bot", rawData: data }]);
     } catch (err) {
-      console.error("Error contacting backend:", err);
-      const errorMessage = {
-        from: "bot",
-        text: "Sorry, I couldn't connect to the campus server. Please try again later.",
-      };
-      setMessages((prevMessages) => [...prevMessages, errorMessage]);
+      console.error("Backend request failed:", err);
+      setMessages((prev) => [
+        ...prev,
+        {
+          from: "bot",
+          type: "simple_message",
+          text: "⚠️ **Connection Error:** Could not connect to the campus server. Please ensure backend is running at `" + API_URL + "`.",
+        },
+      ]);
     } finally {
       setIsLoading(false);
     }
   };
 
-  // --- NEW RENDER ---
+  const copyToClipboard = (text, idx) => {
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(typeof text === "string" ? text : JSON.stringify(text, null, 2));
+      setCopiedIndex(idx);
+      setTimeout(() => setCopiedIndex(null), 2000);
+    }
+  };
+
+  const clearChat = () => {
+    setMessages([
+      {
+        from: "bot",
+        type: "simple_message",
+        text: "🧹 Conversation cleared. How can I help you today?",
+      },
+    ]);
+  };
+
+  // Filtered Lists for Dedicated Tabs
+  const filteredFaculty = useMemo(() => {
+    if (!facultySearch.trim()) return ALL_FACULTY;
+    const q = facultySearch.toLowerCase();
+    return ALL_FACULTY.filter(
+      (f) =>
+        f.Name.toLowerCase().includes(q) ||
+        f.Department.toLowerCase().includes(q) ||
+        f.Specialization.toLowerCase().includes(q) ||
+        f.Office.toLowerCase().includes(q)
+    );
+  }, [facultySearch]);
+
+  const filteredCafes = useMemo(() => {
+    if (!cafeSearch.trim()) return ALL_CAFES;
+    const q = cafeSearch.toLowerCase();
+    return ALL_CAFES.filter(
+      (c) => c.name.toLowerCase().includes(q) || c.category.toLowerCase().includes(q)
+    );
+  }, [cafeSearch]);
+
+  const filteredDoaa = useMemo(() => {
+    if (!doaaSearch.trim()) return ALL_DOAA_PROCEDURES;
+    const q = doaaSearch.toLowerCase();
+    return ALL_DOAA_PROCEDURES.filter(
+      (p) => p.task.toLowerCase().includes(q) || p.summary.toLowerCase().includes(q)
+    );
+  }, [doaaSearch]);
+
+  // Card Renderers for Chat Message
+  const renderBotContent = (msg, index) => {
+    if (msg.type === "simple_message" || msg.text) {
+      return (
+        <div className="markdown-content">
+          <ReactMarkdown>{msg.text || msg.response}</ReactMarkdown>
+        </div>
+      );
+    }
+
+    const data = msg.rawData;
+    if (!data) return "Empty response.";
+
+    if (data.type === "simple_message") {
+      return (
+        <div className="markdown-content">
+          <ReactMarkdown>{data.response}</ReactMarkdown>
+        </div>
+      );
+    }
+
+    if (data.type === "timetable_display" && data.data) {
+      const { title, schedule } = data.data;
+      return (
+        <div className="rich-timetable-card">
+          <div className="card-header-badge">
+            <FaCalendarAlt /> <ReactMarkdown>{title}</ReactMarkdown>
+          </div>
+          {schedule.length === 0 || schedule[0].type === "Free" ? (
+            <div className="empty-schedule-alert">
+              🎉 <strong>No classes scheduled!</strong> Enjoy your free day.
+            </div>
+          ) : (
+            <div className="table-responsive">
+              <table className="modern-timetable-table">
+                <thead>
+                  <tr>
+                    <th>Time</th>
+                    <th>Course / Subject</th>
+                    <th>Type</th>
+                    <th>Venue</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {schedule.map((slot, i) => (
+                    <tr key={i}>
+                      <td className="time-cell">{slot.time}</td>
+                      <td className="subject-cell">{slot.subject}</td>
+                      <td>
+                        <span className={`badge-type ${slot.type === 'L' ? 'lecture' : slot.type === 'P' ? 'practical' : 'tutorial'}`}>
+                          {slot.type === 'L' ? 'Lecture' : slot.type === 'P' ? 'Practical' : slot.type === 'T' ? 'Tutorial' : slot.type}
+                        </span>
+                      </td>
+                      <td className="room-cell">📍 {slot.room}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    if (data.type === "faculty_info" && Array.isArray(data.data)) {
+      return (
+        <div className="rich-faculty-container">
+          <div className="faculty-grid">
+            {data.data.map((f, i) => (
+              <div key={i} className="modern-faculty-card">
+                <div className="faculty-card-top">
+                  <div className="faculty-avatar-circle">
+                    {f.Name.replace(/Dr\.|Prof\./gi, "").trim().charAt(0)}
+                  </div>
+                  <div>
+                    <h4 className="faculty-name">{f.Name}</h4>
+                    <span className="faculty-dept-badge">{f.Department}</span>
+                  </div>
+                </div>
+                {f.Specialization && (
+                  <p className="faculty-specialization">
+                    <strong>Focus:</strong> {f.Specialization}
+                  </p>
+                )}
+                <div className="faculty-details-row">
+                  {f.Office && (
+                    <div className="detail-chip">
+                      <FaMapMarkerAlt /> {f.Office}
+                    </div>
+                  )}
+                  {f.Email && (
+                    <a href={`mailto:${f.Email}`} className="detail-chip link-chip">
+                      <FaEnvelope /> {f.Email}
+                    </a>
+                  )}
+                </div>
+                {f.link && (
+                  <a href={f.link} target="_blank" rel="noreferrer" className="profile-btn">
+                    View Academic Profile <FaExternalLinkAlt size={11} />
+                  </a>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    if (data.type === "subject_info" && data.data) {
+      const s = data.data;
+      return (
+        <div className="rich-subject-card">
+          <div className="subject-card-header">
+            <div>
+              <span className="subject-code-tag">{s.code || s.subjectCode}</span>
+              <h3 className="subject-title">{s.name}</h3>
+            </div>
+            <div className="subject-credits-pill">
+              <span className="credits-number">{s.credit}</span>
+              <span className="credits-label">Credits</span>
+            </div>
+          </div>
+          <div className="subject-meta-grid">
+            <div className="meta-box">
+              <span className="meta-label">Structure (L-T-P)</span>
+              <span className="meta-val">{s.ltp || "3-0-2"}</span>
+            </div>
+            <div className="meta-box">
+              <span className="meta-label">Course Type</span>
+              <span className="meta-val">{s.isCore === "Yes" ? "Core Mandatory" : "Elective"}</span>
+            </div>
+          </div>
+          {s.description && (
+            <div className="subject-desc-box">
+              <p>{s.description}</p>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    if (data.type === "cafeteria_info" && data.data) {
+      const c = data.data;
+      return (
+        <div className="rich-cafe-card">
+          <div className="cafe-header-strip">
+            <FaUtensils /> <h4>{c.name}</h4>
+          </div>
+          <div className="cafe-actions-grid">
+            {c.menuImageUrl && (
+              <button
+                className="cafe-btn menu-btn"
+                onClick={() => setFullScreenImage(c.menuImageUrl)}
+              >
+                📜 View Full Menu Card
+              </button>
+            )}
+            {c.scannerImageUrl && (
+              <button
+                className="cafe-btn qr-btn"
+                onClick={() => setFullScreenImage(c.scannerImageUrl)}
+              >
+                <FaQrcode /> Scan & Pay (UPI)
+              </button>
+            )}
+          </div>
+        </div>
+      );
+    }
+
+    if (data.type === "dispensary_info" && data.data) {
+      const d = data.data;
+      return (
+        <div className="rich-dispensary-card">
+          <div className="dispensary-top">
+            <FaHospitalAlt size={24} className="dispensary-icon" />
+            <div>
+              <h3>{d.name || "University Health & Medical Center"}</h3>
+              <p><FaMapMarkerAlt /> {d.location || "Near Sports Complex, Central Campus"}</p>
+            </div>
+          </div>
+          <div className="dispensary-body">
+            <div className="dispensary-hours">
+              <h4><FaClock /> Operating Hours</h4>
+              <ul>
+                {d.hours && Array.isArray(d.hours) ? (
+                  d.hours.map((h, i) => <li key={i}>{h}</li>)
+                ) : (
+                  <li>24x7 Emergency Services Available</li>
+                )}
+              </ul>
+            </div>
+            <div className="dispensary-contact">
+              <h4><FaPhoneAlt /> Emergency Hotline</h4>
+              <p className="phone-highlight">{d.phone || "+91-175-2393100"}</p>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    return <pre className="json-raw">{JSON.stringify(data, null, 2)}</pre>;
+  };
+
   return (
-    <div className="App-container">
-      {" "}
-      {/* Renamed from .App to avoid old styles */}
-      {/* 1. THE SIDEBAR */}
-      {/* It receives the current active tab and the function to change it */}
+    <div className="app-layout">
+      {/* 1. SIDEBAR */}
       <Sidebar activeTab={activeTab} onTabClick={setActiveTab} />
-      {/* 2. THE MAIN CONTENT AREA */}
-      {/* This area will show content based on the activeTab state */}
-      <main className="main-content">
-        {/* --- CONTENT 1: CHATBOT (Visible only if activeTab is 'chat') --- */}
+
+      {/* 2. MAIN WORKSPACE */}
+      <main className="main-viewport">
+        {/* ==============================================
+            TAB 1: AI CHAT ASSISTANT
+            ============================================== */}
         {activeTab === "chat" && (
-          <div className="chat-container">
-            {" "}
-            {/* A new container for the chat */}
-            {/* Your old header, now styled as a content header */}
-            <header className="content-header">
-              <h1>AI Assistant</h1>
-              <p>Your guide to all things campus.</p>
+          <div className="chat-interface">
+            <header className="workspace-header">
+              <div className="header-info">
+                <div className="header-badge">AI Assistant</div>
+                <h1>CampusGPT</h1>
+                <p>Real-time university timetable, faculty directory, cafeterias & DOAA guidance</p>
+              </div>
+              <div className="header-actions">
+                <button
+                  className="glass-btn"
+                  onClick={clearChat}
+                  title="Clear Chat History"
+                >
+                  <FaTrashAlt /> Clear
+                </button>
+                <button
+                  className="glass-btn"
+                  onClick={() => setIsModalOpen(true)}
+                  title="Prompt Guide"
+                >
+                  <FaInfoCircle /> Guide
+                </button>
+                <button
+                  className="glass-btn primary"
+                  onClick={() => setActiveTab("navigation")}
+                  title="Campus Map"
+                >
+                  <FaMapMarkedAlt /> Map
+                </button>
+              </div>
             </header>
-            {/* Your existing chat UI */}
-            <div className="message-list">
+
+            {/* Quick Action Suggestion Chips */}
+            <div className="quick-chips-bar">
+              <span className="chips-title">Suggested:</span>
+              <div className="chips-scroller">
+                {QUICK_ACTIONS.map((chip, idx) => (
+                  <button
+                    key={idx}
+                    className="chip-btn"
+                    onClick={() => handleSendMessage(chip.query)}
+                  >
+                    {chip.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Message Thread */}
+            <div className="messages-thread">
               {messages.map((msg, index) => (
-                <div key={index} className={`message ${msg.from}`}>
-                  <div className="message-bubble">
-                    {typeof msg.text === "string" ? (
-                      <ReactMarkdown>{msg.text}</ReactMarkdown>
-                    ) : (
-                      msg.text
+                <div
+                  key={index}
+                  className={`message-row ${msg.from === "user" ? "user-row" : "bot-row"}`}
+                >
+                  {msg.from === "bot" && (
+                    <div className="bot-avatar">
+                      <FaRobot />
+                    </div>
+                  )}
+                  <div className={`message-bubble ${msg.from === "user" ? "user-bubble" : "bot-bubble"}`}>
+                    {renderBotContent(msg, index)}
+                    {msg.from === "bot" && (
+                      <div className="bubble-actions">
+                        <button
+                          className="action-icon-btn"
+                          onClick={() => copyToClipboard(msg.text || msg.rawData?.response || msg.rawData, index)}
+                          title="Copy text"
+                        >
+                          {copiedIndex === index ? <FaCheck color="#10B981" /> : <FaRegCopy />}
+                        </button>
+                      </div>
                     )}
                   </div>
                 </div>
               ))}
+
               {isLoading && (
-                <div className="message bot">
-                  <div className="message-bubble typing-indicator">
-                    <span></span>
-                    <span></span>
-                    <span></span>
+                <div className="message-row bot-row">
+                  <div className="bot-avatar">
+                    <FaRobot />
+                  </div>
+                  <div className="message-bubble bot-bubble typing-bubble">
+                    <div className="pulse-dots">
+                      <span></span>
+                      <span></span>
+                      <span></span>
+                    </div>
+                    <span className="typing-label">CampusGPT is thinking...</span>
                   </div>
                 </div>
               )}
               <div ref={messagesEndRef} />
             </div>
-            {/* Your existing input form */}
-            <form onSubmit={handleSend} className="input-bar">
+
+            {/* Input Bar */}
+            <form
+              className="chat-input-bar"
+              onSubmit={(e) => {
+                e.preventDefault();
+                handleSendMessage();
+              }}
+            >
               <input
                 type="text"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                placeholder={
-                  isLoading ? "Bot is typing..." : "Ask something..."
-                }
+                placeholder="Ask about batch timetables, professors, cafe menus, or DOAA procedures..."
                 disabled={isLoading}
               />
               <button
-                className="icon-button"
-                onClick={() => setIsModalOpen(true)}
-                type="button"
-                title="Prompt Guide"
+                type="submit"
+                disabled={isLoading || !input.trim()}
+                className="send-btn"
               >
-                ℹ️
-              </button>
-              <button
-                type="button"
-                onClick={openMapModal}
-                className="icon-button"
-                title="Open Campus Map"
-              >
-                🗺️
-              </button>
-              <button type="submit" disabled={isLoading}>
-                Send
+                <FaPaperPlane />
               </button>
             </form>
           </div>
         )}
 
-        {/* --- CONTENT 2: MAP (Visible only if activeTab is 'navigation') --- */}
-        {activeTab === "navigation" && (
-          <div className="map-container">
-            <header className="content-header">
-              <h1>Campus Map & Navigation</h1>
-              <p>Find buildings, labs, and get directions.</p>
+        {/* ==============================================
+            TAB 2: INTERACTIVE FACULTY DIRECTORY
+            ============================================== */}
+        {activeTab === "faculty" && (
+          <div className="tab-pane-container">
+            <header className="pane-header">
+              <div>
+                <h2>Faculty Directory</h2>
+                <p>Browse contact details, office locations, and specializations of institute professors.</p>
+              </div>
+              <div className="search-box-wrapper">
+                <FaSearch className="search-icon" />
+                <input
+                  type="text"
+                  placeholder="Search faculty by name, department, or research area..."
+                  value={facultySearch}
+                  onChange={(e) => setFacultySearch(e.target.value)}
+                />
+              </div>
             </header>
-            <div className="map-wrapper">
+
+            <div className="faculty-grid">
+              {filteredFaculty.map((f) => (
+                <div key={f.FacultyID} className="modern-faculty-card">
+                  <div className="faculty-card-top">
+                    <div className="faculty-avatar-circle">
+                      {f.Name.replace(/Dr\.|Prof\./gi, "").trim().charAt(0)}
+                    </div>
+                    <div>
+                      <h4 className="faculty-name">{f.Name}</h4>
+                      <span className="faculty-dept-badge">{f.Department}</span>
+                    </div>
+                  </div>
+                  <p className="faculty-specialization">
+                    <strong>Research:</strong> {f.Specialization}
+                  </p>
+                  <div className="faculty-details-row">
+                    <div className="detail-chip">
+                      <FaMapMarkerAlt /> {f.Office}
+                    </div>
+                    <a href={`mailto:${f.Email}`} className="detail-chip link-chip">
+                      <FaEnvelope /> {f.Email}
+                    </a>
+                  </div>
+                  <div className="card-footer-actions">
+                    <a href={f.link} target="_blank" rel="noreferrer" className="profile-btn">
+                      Profile <FaExternalLinkAlt size={11} />
+                    </a>
+                    <button
+                      className="ask-chat-btn"
+                      onClick={() => {
+                        setActiveTab("chat");
+                        handleSendMessage(`tell me about ${f.Name}`);
+                      }}
+                    >
+                      Ask in Chat
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* ==============================================
+            TAB 3: INTERACTIVE TIMETABLE EXPLORER
+            ============================================== */}
+        {activeTab === "timetable" && (
+          <div className="tab-pane-container">
+            <header className="pane-header">
+              <div>
+                <h2>Batch Timetable Explorer</h2>
+                <p>Select your batch code and weekday to view scheduled lectures, labs, and venues.</p>
+              </div>
+              <div className="timetable-filters">
+                <select
+                  value={selectedBatch}
+                  onChange={(e) => setSelectedBatch(e.target.value)}
+                  className="batch-select"
+                >
+                  <option value="2C24">Batch 2C24 (2nd Year)</option>
+                  <option value="1A11">Batch 1A11 (1st Year)</option>
+                  <option value="1A12">Batch 1A12 (1st Year)</option>
+                  <option value="3C24">Batch 3C24 (3rd Year)</option>
+                  <option value="COE1">Batch COE1</option>
+                  <option value="COE21">Batch COE21</option>
+                </select>
+              </div>
+            </header>
+
+            {/* Day Selector Tabs */}
+            <div className="day-pills-bar">
+              {["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"].map((day) => (
+                <button
+                  key={day}
+                  className={`day-pill ${selectedDay === day ? "active" : ""}`}
+                  onClick={() => setSelectedDay(day)}
+                >
+                  {day}
+                </button>
+              ))}
+            </div>
+
+            {batchLoading ? (
+              <div className="loading-state">
+                <div className="pulse-dots">
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                </div>
+                <p>Loading schedule for {selectedBatch}...</p>
+              </div>
+            ) : batchSchedule && batchSchedule.schedule && batchSchedule.schedule.length > 0 ? (
+              <div className="timetable-sheet-card">
+                <div className="sheet-header">
+                  <h3>{selectedBatch} — {selectedDay} Schedule</h3>
+                  <span className="total-slots-badge">{batchSchedule.schedule.length} Slots</span>
+                </div>
+                <div className="table-responsive">
+                  <table className="modern-timetable-table">
+                    <thead>
+                      <tr>
+                        <th>Time Slot</th>
+                        <th>Subject / Course</th>
+                        <th>Component</th>
+                        <th>Classroom / Lab</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {batchSchedule.schedule.map((slot, i) => (
+                        <tr key={i}>
+                          <td className="time-cell">{slot.time}</td>
+                          <td className="subject-cell">{slot.subject}</td>
+                          <td>
+                            <span className={`badge-type ${slot.type === 'L' ? 'lecture' : slot.type === 'P' ? 'practical' : 'tutorial'}`}>
+                              {slot.type === 'L' ? 'Lecture' : slot.type === 'P' ? 'Practical' : slot.type === 'T' ? 'Tutorial' : slot.type}
+                            </span>
+                          </td>
+                          <td className="room-cell">📍 {slot.room}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            ) : (
+              <div className="empty-schedule-card">
+                <p>🎉 No classes scheduled for {selectedBatch} on {selectedDay}.</p>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ==============================================
+            TAB 4: CAMPUS CAFETERIA & DINING
+            ============================================== */}
+        {activeTab === "cafeteria" && (
+          <div className="tab-pane-container">
+            <header className="pane-header">
+              <div>
+                <h2>Campus Cafeteria & Menus</h2>
+                <p>Explore food outlets across campus, view real-time menu cards and UPI payment QR codes.</p>
+              </div>
+              <div className="search-box-wrapper">
+                <FaSearch className="search-icon" />
+                <input
+                  type="text"
+                  placeholder="Search cafe or cuisine..."
+                  value={cafeSearch}
+                  onChange={(e) => setCafeSearch(e.target.value)}
+                />
+              </div>
+            </header>
+
+            <div className="cafe-grid">
+              {filteredCafes.map((cafe) => (
+                <div key={cafe.id} className="modern-cafe-card">
+                  <div className="cafe-card-top">
+                    <div className="cafe-icon-badge">
+                      <FaUtensils />
+                    </div>
+                    <div>
+                      <h3>{cafe.name}</h3>
+                      <span className="cafe-category">{cafe.category}</span>
+                    </div>
+                  </div>
+                  <div className="cafe-time-row">
+                    <FaClock /> <span>{cafe.timing}</span>
+                  </div>
+                  <div className="cafe-actions-row">
+                    {cafe.menuImageUrl && (
+                      <button
+                        className="cafe-btn menu-btn"
+                        onClick={() => setFullScreenImage(cafe.menuImageUrl)}
+                      >
+                        📜 Menu
+                      </button>
+                    )}
+                    {cafe.scannerImageUrl && (
+                      <button
+                        className="cafe-btn qr-btn"
+                        onClick={() => setFullScreenImage(cafe.scannerImageUrl)}
+                      >
+                        <FaQrcode /> Scan QR
+                      </button>
+                    )}
+                    <button
+                      className="cafe-btn ask-btn"
+                      onClick={() => {
+                        setActiveTab("chat");
+                        handleSendMessage(`${cafe.name} menu`);
+                      }}
+                    >
+                      Chat Info
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* ==============================================
+            TAB 5: DOAA ACADEMIC PROCEDURES
+            ============================================== */}
+        {activeTab === "doaa" && (
+          <div className="tab-pane-container">
+            <header className="pane-header">
+              <div>
+                <h2>DOAA Academic Procedures & Certificates</h2>
+                <p>Standard guidelines for group changes, subject add/drop, fee extensions, makeups, and official certificates.</p>
+              </div>
+              <div className="search-box-wrapper">
+                <FaSearch className="search-icon" />
+                <input
+                  type="text"
+                  placeholder="Search academic procedure or policy..."
+                  value={doaaSearch}
+                  onChange={(e) => setDoaaSearch(e.target.value)}
+                />
+              </div>
+            </header>
+
+            <div className="doaa-accordion-list">
+              {filteredDoaa.map((item) => (
+                <div key={item.id} className="doaa-procedure-card">
+                  <div className="procedure-head">
+                    <div className="procedure-number-badge">{item.id}</div>
+                    <div>
+                      <h3>{item.task}</h3>
+                      <p className="procedure-summary">{item.summary}</p>
+                    </div>
+                  </div>
+                  <div className="procedure-steps-box">
+                    <h4>Procedure Steps:</h4>
+                    <pre className="steps-text">{item.steps}</pre>
+                  </div>
+                  <div className="procedure-footer">
+                    <button
+                      className="ask-chat-btn"
+                      onClick={() => {
+                        setActiveTab("chat");
+                        handleSendMessage(`how to ${item.task}`);
+                      }}
+                    >
+                      Ask in Chat <FaChevronRight size={10} />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* ==============================================
+            TAB 6: CAMPUS MAP & NAVIGATION
+            ============================================== */}
+        {activeTab === "navigation" && (
+          <div className="map-view-fullscreen">
+            <header className="pane-header map-header">
+              <div>
+                <h2>Campus Map & Navigation</h2>
+                <p>Explore buildings, academic blocks, hostels, and sports facilities.</p>
+              </div>
+            </header>
+            <div className="map-wrapper-fullscreen">
               <MapComponent isVisible={true} ref={mapCompRef} />
             </div>
           </div>
         )}
-
-        {/* --- PLACEHOLDERS FOR OTHER TABS --- */}
-        {activeTab === "faculty" && (
-          <div className="placeholder-container">
-            <h1>Faculty Search</h1>
-            <p>
-              Please Enter Dr. Faculty_Name to get the information in chat
-            </p>
-            <button
-              className="placeholder-button"
-              onClick={() => setActiveTab("chat")}
-            >
-              Go to Chat
-            </button>
-          </div>
-        )}
-
-        {/* --- CONTENT 4: DOCUMENT INFO (DOAA) --- */}
-        {activeTab === "doaa" && (
-          
-          <div className="content-container">
-            <div className="placeholder-container">
-            <h1>Document & DOAA Info</h1>
-            <p>
-              Please Enter relsted keywords to get better results
-            </p>
-            <button onClick={() => setActiveTab("chat")}>Go to Chat</button>
-          </div>
-            {" "}
-            {/* Use a generic container */}
-            {/* <header className="content-header">
-              <h1>Document & DOAA Info</h1>
-              <p>Common procedures and certificate information.</p>
-            </header>
-            <button
-              className="placeholder-button"
-              onClick={() => setActiveTab("chat")}
-            >
-              Go to Chat
-            </button> */}
-            <div className="info-card-grid">
-              <div className="info-card">
-                <h3>Bonafide Certificate</h3>
-                <p>
-                  A Bonafide Certificate is used to prove you are a student of
-                  this university. You can apply for it through the WebKiosk
-                  portal.
-                </p>
-              </div>
-
-              <div className="info-card">
-                <h3>Semester Drop</h3>
-                <p>
-                  To apply for a semester drop, you must submit a formal
-                  application to the DOAA office, citing your reasons (medical,
-                  personal, etc.).
-                </p>
-              </div>
-
-              <div className="info-card">
-                <h3>Transcript Application</h3>
-                <p>
-                  Official transcripts can be requested from the examination
-                  cell. This is required for higher studies or visa
-                  applications.
-                </p>
-              </div>
-
-              <div className="info-card">
-                <h3>Change of Elective</h3>
-                <p>
-                  You can change your registered elective subjects during the
-                  add/drop period at the beginning of the semester via WebKiosk.
-                </p>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {activeTab === "timetable" && (
-          <div className="placeholder-container">
-            <h1>Timetables</h1>
-            <p>
-              Please Enter the BatchCode in the chat to get the schedule of the day like 2C24
-            </p>
-            <button onClick={() => setActiveTab("chat")}>Go to Chat</button>
-          </div>
-        )}
-
-        {activeTab === "cafeteria" && (
-          <div className="placeholder-container">
-            <h1>Cafeteria</h1>
-            <p>
-              Please search theese in the chat!
-            </p>
-            <button onClick={() => setActiveTab("chat")}>Go to Chat</button>
-            <div className="info-card-grid">
-              {cafeteriaData.map((cafe) => (
-                <div className="info-card" key={cafe.id} style={{ cursor: 'default' }}>
-                  {/* Title & Location */}
-                  <div className="info-card-header">
-                    <h3>{cafe.name}</h3>
-                  </div>
-                  
-                  <div className="info-card-body" style={{ opacity: 1, maxHeight: 'none', padding: '0 24px 24px' }}>
-                    
-                    <div className="cafe-button-group">
-                      {/* View Menu Button - Opens Fullscreen */}
-                      
-
-                      {/* Scan QR Button - Opens Fullscreen */}
-                      
-                    </div>
-                  </div>
-                </div>
-              ))}
-              </div>
-          </div>
-        )}
       </main>
-      {/* --- ALL YOUR MODALS --- */}
-      {/* These now live outside the main content so they can overlay everything */}
+
+      {/* MODALS */}
       {isModalOpen && <UserManualModal onClose={() => setIsModalOpen(false)} />}
-      {isMapModalOpen && (
-        <div className="map-modal-overlay" onClick={closeMapModal}>
-          <div
-            className="map-modal-content"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <MapComponent isVisible={isMapModalOpen} ref={mapCompRef} />
-            <button
-              onClick={closeMapModal}
-              className="close-modal-button"
-              aria-label="Close map"
-            >
-              &times;
-            </button>
-          </div>
-        </div>
-      )}
+
       {fullScreenImage && (
         <div
           className="fullscreen-image-overlay"
           onClick={() => setFullScreenImage(null)}
         >
-          <img
-            src={fullScreenImage}
-            alt="Menu Fullscreen"
-            className="fullscreen-image-content"
-            onClick={(e) => e.stopPropagation()}
-          />
+          <div className="image-lightbox-wrapper" onClick={(e) => e.stopPropagation()}>
+            <button
+              className="lightbox-close-btn"
+              onClick={() => setFullScreenImage(null)}
+            >
+              <FaTimes />
+            </button>
+            <img
+              src={fullScreenImage}
+              alt="Preview"
+              className="fullscreen-image-content"
+            />
+          </div>
         </div>
       )}
     </div>

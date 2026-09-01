@@ -1,6 +1,6 @@
-// src/components/Sidebar.js
+// campusgpt-frontend/src/components/Sidebar.js
 import React from "react";
-import "./Sidebar.css"; // We will create this next
+import "./Sidebar.css";
 import {
   FaRobot,
   FaMapMarkedAlt,
@@ -8,44 +8,57 @@ import {
   FaChalkboardTeacher,
   FaCalendarAlt,
   FaUtensils,
+  FaGraduationCap
 } from "react-icons/fa";
 
-// This component receives the 'activeTab' and a function to change it
 const Sidebar = ({ activeTab, onTabClick }) => {
-  // A list of all your app's features
   const menuItems = [
-    { id: "chat", label: "AI Assistant", icon: <FaRobot /> },
-    { id: "navigation", label: "Campus Map", icon: <FaMapMarkedAlt /> },
-    { id: "faculty", label: "Faculty Search", icon: <FaChalkboardTeacher /> },
-    { id: "doaa", label: "Document Info", icon: <FaUniversity /> },
+    { id: "chat", label: "AI Assistant", icon: <FaRobot />, badge: "AI" },
     { id: "timetable", label: "Timetables", icon: <FaCalendarAlt /> },
-    { id: "cafeteria", label: "Cafeteria", icon: <FaUtensils /> },
+    { id: "faculty", label: "Faculty Directory", icon: <FaChalkboardTeacher /> },
+    { id: "cafeteria", label: "Cafeterias", icon: <FaUtensils /> },
+    { id: "doaa", label: "DOAA Procedures", icon: <FaUniversity /> },
+    { id: "navigation", label: "Campus Map", icon: <FaMapMarkedAlt /> },
   ];
 
   return (
-    <nav className="sidebar">
-      <div className="sidebar-header">
-        <h2>UniVerse</h2>
+    <aside className="sidebar-container">
+      <div className="sidebar-brand">
+        <div className="brand-logo-icon">
+          <FaGraduationCap />
+        </div>
+        <div>
+          <h2>UniVerse</h2>
+          <span className="brand-tagline">Campus Assistant</span>
+        </div>
       </div>
-      <ul className="sidebar-menu">
-        {menuItems.map((item) => (
-          <li key={item.id} className="menu-item-container">
-            <button
-              // Set 'active' class if this item's ID matches the activeTab state
-              className={`menu-item ${activeTab === item.id ? "active" : ""}`}
-              // When clicked, tell App.js to change the state to this item's ID
-              onClick={() => onTabClick(item.id)}
-            >
-              <span className="menu-icon">{item.icon}</span>
-              <span className="menu-label">{item.label}</span>
-            </button>
-          </li>
-        ))}
-      </ul>
-      <div className="sidebar-footer">
-        <p>Public Campus Tool</p>
+
+      <nav className="sidebar-nav">
+        <div className="nav-section-label">Navigation</div>
+        <ul className="sidebar-menu-list">
+          {menuItems.map((item) => (
+            <li key={item.id}>
+              <button
+                className={`menu-pill-btn ${activeTab === item.id ? "active" : ""}`}
+                onClick={() => onTabClick(item.id)}
+              >
+                <span className="menu-icon-wrapper">{item.icon}</span>
+                <span className="menu-item-text">{item.label}</span>
+                {item.badge && <span className="menu-ai-badge">{item.badge}</span>}
+              </button>
+            </li>
+          ))}
+        </ul>
+      </nav>
+
+      <div className="sidebar-footer-card">
+        <div className="footer-status-indicator">
+          <span className="status-dot"></span>
+          <span>System Online</span>
+        </div>
+        <p className="footer-copyright">Thapar University</p>
       </div>
-    </nav>
+    </aside>
   );
 };
 

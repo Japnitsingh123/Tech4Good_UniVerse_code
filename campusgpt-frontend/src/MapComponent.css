@@ -1,0 +1,322 @@
+/* campusgpt-frontend/src/MapComponent.css */
+
+.map-component-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  position: relative;
+  background: #080c15;
+  overflow: hidden;
+}
+
+.map-area {
+  flex: 1;
+  width: 100%;
+  height: 100%;
+  min-height: 400px;
+  position: relative;
+  z-index: 1;
+}
+
+/* Ensure Leaflet container fills 100% of the area */
+.leaflet-container {
+  width: 100% !important;
+  height: 100% !important;
+  background: #0d1322 !important;
+}
+
+/* Custom modern map controls floating bar */
+.map-floating-controls {
+  position: absolute;
+  top: 16px;
+  left: 60px;
+  right: 16px;
+  z-index: 1000;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  pointer-events: none;
+}
+
+.map-floating-controls > * {
+  pointer-events: auto;
+}
+
+.map-search-card {
+  background: rgba(14, 20, 34, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  padding: 12px 16px;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(20px);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  max-width: 600px;
+}
+
+.map-control-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.map-control-group label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #94a3b8;
+}
+
+/* SELECT & OPTION STYLING TO PREVENT WHITE-ON-WHITE INVISIBILITY */
+.map-select {
+  background: #1e293b !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  color: #f8fafc !important;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  outline: none;
+  cursor: pointer;
+  width: 100%;
+}
+
+.map-select:focus {
+  border-color: #6366f1 !important;
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.3) !important;
+}
+
+.map-select optgroup {
+  background-color: #0f172a !important;
+  color: #818cf8 !important;
+  font-weight: 700;
+  font-size: 12px;
+  padding: 6px 4px;
+}
+
+.map-select option {
+  background-color: #1e293b !important;
+  color: #f8fafc !important;
+  padding: 8px 12px !important;
+  font-size: 13px !important;
+  font-weight: 500;
+}
+
+.map-actions-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.map-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.map-btn.primary {
+  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+  color: #fff;
+  box-shadow: 0 4px 14px rgba(99, 102, 241, 0.4);
+}
+
+.map-btn.primary:hover {
+  transform: translateY(-1px);
+  opacity: 0.95;
+}
+
+.map-btn.success {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: #fff;
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.4);
+}
+
+.map-btn.danger {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  color: #fff;
+  box-shadow: 0 4px 14px rgba(239, 68, 68, 0.4);
+}
+
+.map-btn.icon-only {
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  background: rgba(255, 255, 255, 0.08);
+  color: #94a3b8;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.map-btn.icon-only.active {
+  background: #f59e0b;
+  color: #fff;
+  border-color: #f59e0b;
+  box-shadow: 0 0 12px rgba(245, 158, 11, 0.5);
+}
+
+/* ETA & Status Info Badge */
+.map-status-pill {
+  background: rgba(14, 20, 34, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  padding: 10px 16px;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(20px);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.eta-highlight {
+  font-size: 17px;
+  font-weight: 800;
+  color: #06b6d4;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.eta-label {
+  font-size: 11px;
+  color: #94a3b8;
+  text-transform: uppercase;
+}
+
+/* Quick Campus Location Filter Chips on Map */
+.map-category-chips {
+  position: absolute;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  display: flex;
+  gap: 8px;
+  background: rgba(14, 20, 34, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  padding: 8px 12px;
+  border-radius: 999px;
+  backdrop-filter: blur(20px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  overflow-x: auto;
+  max-width: 90vw;
+}
+
+.category-chip-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #cbd5e1;
+  padding: 5px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+
+.category-chip-btn:hover {
+  background: rgba(99, 102, 241, 0.2);
+  border-color: #6366f1;
+  color: #fff;
+}
+
+.category-chip-btn.active {
+  background: #6366f1;
+  border-color: #6366f1;
+  color: #fff;
+  box-shadow: 0 2px 10px rgba(99, 102, 241, 0.4);
+}
+
+/* Notification message toast */
+.map-toast-msg {
+  position: absolute;
+  top: 90px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1001;
+  padding: 8px 18px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  transition: all 0.3s ease;
+  backdrop-filter: blur(12px);
+}
+
+.map-toast-msg.error {
+  background: rgba(239, 68, 68, 0.9);
+  color: #fff;
+}
+
+.map-toast-msg.success {
+  background: rgba(16, 185, 129, 0.9);
+  color: #fff;
+}
+
+/* Custom Leaflet Dark Popup */
+.leaflet-popup-content-wrapper {
+  background: rgba(14, 20, 34, 0.95) !important;
+  color: #fff !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  border-radius: 10px !important;
+  backdrop-filter: blur(16px) !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6) !important;
+}
+
+.leaflet-popup-tip {
+  background: rgba(14, 20, 34, 0.95) !important;
+}
+
+.leaflet-popup-content b {
+  color: #67e8f9;
+  font-size: 14px;
+}
+
+/* Leaflet Marker Tooltips */
+.leaflet-tooltip {
+  background: rgba(14, 20, 34, 0.95) !important;
+  color: #f8fafc !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  border-radius: 6px !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  padding: 3px 8px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5) !important;
+  backdrop-filter: blur(12px) !important;
+}
+
+.leaflet-tooltip-top:before {
+  border-top-color: rgba(14, 20, 34, 0.95) !important;
+}
+
+@media (max-width: 768px) {
+  .map-floating-controls {
+    left: 12px;
+    right: 12px;
+    top: 10px;
+  }
+  .map-search-card {
+    flex-direction: column;
+    width: 100%;
+    max-width: none;
+  }
+  .map-actions-group {
+    width: 100%;
+    justify-content: stretch;
+  }
+  .map-actions-group .map-btn {
+    flex: 1;
+  }
+}
