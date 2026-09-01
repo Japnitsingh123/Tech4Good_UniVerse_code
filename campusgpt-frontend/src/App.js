@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useMemo } from "react";
+import React, { useState, useRef, useEffect, useMemo, useCallback } from "react";
 import "./App.css";
 import ReactMarkdown from "react-markdown";
 import "leaflet/dist/leaflet.css";
@@ -10,8 +10,6 @@ import {
   FaRobot,
   FaPaperPlane,
   FaMapMarkedAlt,
-  FaUniversity,
-  FaChalkboardTeacher,
   FaCalendarAlt,
   FaUtensils,
   FaInfoCircle,
@@ -26,9 +24,6 @@ import {
   FaExternalLinkAlt,
   FaQrcode,
   FaTimes,
-  FaBook,
-  FaFileAlt,
-  FaUserGraduate,
   FaChevronRight,
   FaHospitalAlt
 } from "react-icons/fa";
@@ -274,7 +269,6 @@ function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [copiedIndex, setCopiedIndex] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isMapModalOpen, setIsMapModalOpen] = useState(false);
   const [fullScreenImage, setFullScreenImage] = useState(null);
 
   // Tab State
@@ -303,14 +297,7 @@ function App() {
       ? "http://localhost:5001"
       : "");
 
-  // Fetch batch timetable when batch or day changes in Timetable tab
-  useEffect(() => {
-    if (activeTab === "timetable") {
-      fetchTimetableTab(selectedBatch, selectedDay);
-    }
-  }, [selectedBatch, selectedDay, activeTab]);
-
-  const fetchTimetableTab = async (batch, day) => {
+  const fetchTimetableTab = useCallback(async (batch, day) => {
     setBatchLoading(true);
     try {
       const res = await fetch(`${API_URL}/api/chat`, {
@@ -329,7 +316,14 @@ function App() {
     } finally {
       setBatchLoading(false);
     }
-  };
+  }, [API_URL]);
+
+  // Fetch batch timetable when batch or day changes in Timetable tab
+  useEffect(() => {
+    if (activeTab === "timetable") {
+      fetchTimetableTab(selectedBatch, selectedDay);
+    }
+  }, [selectedBatch, selectedDay, activeTab, fetchTimetableTab]);
 
   const handleSendMessage = async (textToSend) => {
     const text = (textToSend || input).trim();
