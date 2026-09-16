@@ -405,206 +405,240 @@ function App() {
 
   // Card Renderers for Chat Message
   const renderBotContent = (msg, index) => {
-    if (msg.type === "simple_message" || msg.text) {
-      return (
-        <div className="markdown-content">
-          <ReactMarkdown>{msg.text || msg.response}</ReactMarkdown>
-        </div>
-      );
-    }
-
-    const data = msg.rawData;
-    if (!data) return "Empty response.";
-
-    if (data.type === "simple_message") {
-      return (
-        <div className="markdown-content">
-          <ReactMarkdown>{data.response}</ReactMarkdown>
-        </div>
-      );
-    }
-
-    if (data.type === "timetable_display" && data.data) {
-      const { title, schedule } = data.data;
-      return (
-        <div className="rich-timetable-card">
-          <div className="card-header-badge">
-            <FaCalendarAlt /> <ReactMarkdown>{title}</ReactMarkdown>
+    try {
+      if (msg.type === "simple_message" || (msg.text && msg.from === "bot")) {
+        return (
+          <div className="markdown-content">
+            <ReactMarkdown>{msg.text || msg.response || ""}</ReactMarkdown>
           </div>
-          {schedule.length === 0 || schedule[0].type === "Free" ? (
-            <div className="empty-schedule-alert">
-              🎉 <strong>No classes scheduled!</strong> Enjoy your free day.
-            </div>
-          ) : (
-            <div className="table-responsive">
-              <table className="modern-timetable-table">
-                <thead>
-                  <tr>
-                    <th>Time</th>
-                    <th>Course / Subject</th>
-                    <th>Type</th>
-                    <th>Venue</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {schedule.map((slot, i) => (
-                    <tr key={i}>
-                      <td className="time-cell">{slot.time}</td>
-                      <td className="subject-cell">{slot.subject}</td>
-                      <td>
-                        <span className={`badge-type ${slot.type === 'L' ? 'lecture' : slot.type === 'P' ? 'practical' : 'tutorial'}`}>
-                          {slot.type === 'L' ? 'Lecture' : slot.type === 'P' ? 'Practical' : slot.type === 'T' ? 'Tutorial' : slot.type}
-                        </span>
-                      </td>
-                      <td className="room-cell">📍 {slot.room}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </div>
-      );
-    }
+        );
+      }
 
-    if (data.type === "faculty_info" && Array.isArray(data.data)) {
-      return (
-        <div className="rich-faculty-container">
-          <div className="faculty-grid">
-            {data.data.map((f, i) => (
-              <div key={i} className="modern-faculty-card">
-                <div className="faculty-card-top">
-                  <div className="faculty-avatar-circle">
-                    {f.Name.replace(/Dr\.|Prof\./gi, "").trim().charAt(0)}
-                  </div>
-                  <div>
-                    <h4 className="faculty-name">{f.Name}</h4>
-                    <span className="faculty-dept-badge">{f.Department}</span>
-                  </div>
-                </div>
-                {f.Specialization && (
-                  <p className="faculty-specialization">
-                    <strong>Focus:</strong> {f.Specialization}
-                  </p>
-                )}
-                <div className="faculty-details-row">
-                  {f.Office && (
-                    <div className="detail-chip">
-                      <FaMapMarkerAlt /> {f.Office}
-                    </div>
-                  )}
-                  {f.Email && (
-                    <a href={`mailto:${f.Email}`} className="detail-chip link-chip">
-                      <FaEnvelope /> {f.Email}
-                    </a>
-                  )}
-                </div>
-                {f.link && (
-                  <a href={f.link} target="_blank" rel="noreferrer" className="profile-btn">
-                    View Academic Profile <FaExternalLinkAlt size={11} />
-                  </a>
-                )}
+      const data = msg.rawData;
+      if (!data) return <div className="markdown-content">{msg.text || "Empty response."}</div>;
+
+      if (data.type === "simple_message") {
+        return (
+          <div className="markdown-content">
+            <ReactMarkdown>{data.response || ""}</ReactMarkdown>
+          </div>
+        );
+      }
+
+      if (data.type === "timetable_display" && data.data) {
+        const title = data.data.title || "Timetable Schedule";
+        const schedule = Array.isArray(data.data.schedule) ? data.data.schedule : [];
+        return (
+          <div className="rich-timetable-card">
+            <div className="card-header-badge">
+              <FaCalendarAlt /> <span>{String(title).replace(/[*_#]/g, '')}</span>
+            </div>
+            {schedule.length === 0 || (schedule[0] && schedule[0].type === "Free") ? (
+              <div className="empty-schedule-alert">
+                🎉 <strong>No classes scheduled!</strong> Enjoy your free day.
               </div>
-            ))}
-          </div>
-        </div>
-      );
-    }
-
-    if (data.type === "subject_info" && data.data) {
-      const s = data.data;
-      return (
-        <div className="rich-subject-card">
-          <div className="subject-card-header">
-            <div>
-              <span className="subject-code-tag">{s.code || s.subjectCode}</span>
-              <h3 className="subject-title">{s.name}</h3>
-            </div>
-            <div className="subject-credits-pill">
-              <span className="credits-number">{s.credit}</span>
-              <span className="credits-label">Credits</span>
-            </div>
-          </div>
-          <div className="subject-meta-grid">
-            <div className="meta-box">
-              <span className="meta-label">Structure (L-T-P)</span>
-              <span className="meta-val">{s.ltp || "3-0-2"}</span>
-            </div>
-            <div className="meta-box">
-              <span className="meta-label">Course Type</span>
-              <span className="meta-val">{s.isCore === "Yes" ? "Core Mandatory" : "Elective"}</span>
-            </div>
-          </div>
-          {s.description && (
-            <div className="subject-desc-box">
-              <p>{s.description}</p>
-            </div>
-          )}
-        </div>
-      );
-    }
-
-    if (data.type === "cafeteria_info" && data.data) {
-      const c = data.data;
-      return (
-        <div className="rich-cafe-card">
-          <div className="cafe-header-strip">
-            <FaUtensils /> <h4>{c.name}</h4>
-          </div>
-          <div className="cafe-actions-grid">
-            {c.menuImageUrl && (
-              <button
-                className="cafe-btn menu-btn"
-                onClick={() => setFullScreenImage(c.menuImageUrl)}
-              >
-                📜 View Full Menu Card
-              </button>
-            )}
-            {c.scannerImageUrl && (
-              <button
-                className="cafe-btn qr-btn"
-                onClick={() => setFullScreenImage(c.scannerImageUrl)}
-              >
-                <FaQrcode /> Scan & Pay (UPI)
-              </button>
+            ) : (
+              <div className="table-responsive">
+                <table className="modern-timetable-table">
+                  <thead>
+                    <tr>
+                      <th>Time</th>
+                      <th>Course / Subject</th>
+                      <th>Type</th>
+                      <th>Venue</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {schedule.map((slot, i) => (
+                      <tr key={i}>
+                        <td className="time-cell">{slot.time || "-"}</td>
+                        <td className="subject-cell">{slot.subject || "-"}</td>
+                        <td>
+                          <span className={`badge-type ${(slot.type || "").toLowerCase() === 'l' ? 'lecture' : (slot.type || "").toLowerCase() === 'p' ? 'practical' : 'tutorial'}`}>
+                            {slot.type === 'L' ? 'Lecture' : slot.type === 'P' ? 'Practical' : slot.type === 'T' ? 'Tutorial' : (slot.type || 'Lecture')}
+                          </span>
+                        </td>
+                        <td className="room-cell">📍 {slot.room || "TBA"}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             )}
           </div>
-        </div>
-      );
-    }
+        );
+      }
 
-    if (data.type === "dispensary_info" && data.data) {
-      const d = data.data;
+      if (data.type === "faculty_info" && Array.isArray(data.data)) {
+        return (
+          <div className="rich-faculty-container">
+            <div className="faculty-grid">
+              {data.data.map((f, i) => {
+                const rawName = f.Name || f.name || "Faculty Member";
+                const cleanName = String(rawName).replace(/Dr\.|Prof\.|Professor|Mr\.|Ms\./gi, "").trim();
+                const avatarLetter = (cleanName.charAt(0) || "F").toUpperCase();
+                const dept = f.Department || f.department || "Academic Department";
+                const spec = f.Specialization || f.specialization || "";
+                const office = f.Office || f.office || "";
+                const email = f.Email || f.email || "";
+                const link = f.link || f.Link || "";
+
+                return (
+                  <div key={f.FacultyID || i} className="modern-faculty-card">
+                    <div className="faculty-card-top">
+                      <div className="faculty-avatar-circle">
+                        {avatarLetter}
+                      </div>
+                      <div>
+                        <h4 className="faculty-name">{rawName}</h4>
+                        <span className="faculty-dept-badge">{dept}</span>
+                      </div>
+                    </div>
+                    {spec && (
+                      <p className="faculty-specialization">
+                        <strong>Focus:</strong> {spec}
+                      </p>
+                    )}
+                    <div className="faculty-details-row">
+                      {office && (
+                        <div className="detail-chip">
+                          <FaMapMarkerAlt /> {office}
+                        </div>
+                      )}
+                      {email && (
+                        <a href={`mailto:${email}`} className="detail-chip link-chip">
+                          <FaEnvelope /> {email}
+                        </a>
+                      )}
+                    </div>
+                    {link && (
+                      <a href={link} target="_blank" rel="noreferrer" className="profile-btn">
+                        View Academic Profile <FaExternalLinkAlt size={11} />
+                      </a>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        );
+      }
+
+      if (data.type === "subject_info" && data.data) {
+        const s = data.data;
+        return (
+          <div className="rich-subject-card">
+            <div className="subject-card-header">
+              <div>
+                <span className="subject-code-tag">{s.code || s.subjectCode || "COURSE"}</span>
+                <h3 className="subject-title">{s.name || s.title || "Course Details"}</h3>
+              </div>
+              <div className="subject-credits-pill">
+                <span className="credits-number">{s.credit || s.credits || "4"}</span>
+                <span className="credits-label">Credits</span>
+              </div>
+            </div>
+            <div className="subject-meta-grid">
+              <div className="meta-box">
+                <span className="meta-label">Structure (L-T-P)</span>
+                <span className="meta-val">{s.ltp || "3-0-2"}</span>
+              </div>
+              <div className="meta-box">
+                <span className="meta-label">Course Type</span>
+                <span className="meta-val">{s.isCore === "Yes" || s.type === "Core" ? "Core Mandatory" : "Elective"}</span>
+              </div>
+            </div>
+            {(s.description || s.desc) && (
+              <div className="subject-desc-box">
+                <p>{s.description || s.desc}</p>
+              </div>
+            )}
+          </div>
+        );
+      }
+
+      if (data.type === "cafeteria_info" && data.data) {
+        const c = data.data;
+        return (
+          <div className="rich-cafe-card">
+            <div className="cafe-header-strip">
+              <FaUtensils /> <h4>{c.name || "Campus Outlet"}</h4>
+            </div>
+            <div className="cafe-actions-grid">
+              {c.menuImageUrl && (
+                <button
+                  type="button"
+                  className="cafe-btn menu-btn"
+                  onClick={() => setFullScreenImage(c.menuImageUrl)}
+                >
+                  📜 View Full Menu Card
+                </button>
+              )}
+              {c.scannerImageUrl && (
+                <button
+                  type="button"
+                  className="cafe-btn qr-btn"
+                  onClick={() => setFullScreenImage(c.scannerImageUrl)}
+                >
+                  <FaQrcode /> Scan & Pay (UPI)
+                </button>
+              )}
+            </div>
+          </div>
+        );
+      }
+
+      if (data.type === "dispensary_info" && data.data) {
+        const d = data.data;
+        const hoursList = Array.isArray(d.hours) ? d.hours : [];
+
+        return (
+          <div className="rich-dispensary-card">
+            <div className="dispensary-top">
+              <FaHospitalAlt size={24} className="dispensary-icon" />
+              <div>
+                <h3>{d.name || "University Health & Medical Center"}</h3>
+                <p><FaMapMarkerAlt /> {d.location || "Near Sports Complex, Central Campus"}</p>
+              </div>
+            </div>
+            <div className="dispensary-body">
+              <div className="dispensary-hours">
+                <h4><FaClock /> Operating Hours</h4>
+                <ul>
+                  {hoursList.length > 0 ? (
+                    hoursList.map((h, i) => {
+                      if (typeof h === "object" && h !== null) {
+                        return (
+                          <li key={i}>
+                            <strong>{h.days || "Schedule"}:</strong> {h.times || "Available"}
+                          </li>
+                        );
+                      }
+                      return <li key={i}>{String(h)}</li>;
+                    })
+                  ) : (
+                    <li>24x7 Emergency Services Available</li>
+                  )}
+                </ul>
+              </div>
+              <div className="dispensary-contact">
+                <h4><FaPhoneAlt /> Emergency Hotline</h4>
+                <p className="phone-highlight">{d.phone || "+91-175-2393100"}</p>
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      return <pre className="json-raw">{JSON.stringify(data, null, 2)}</pre>;
+    } catch (err) {
+      console.error("Error rendering message:", err);
       return (
-        <div className="rich-dispensary-card">
-          <div className="dispensary-top">
-            <FaHospitalAlt size={24} className="dispensary-icon" />
-            <div>
-              <h3>{d.name || "University Health & Medical Center"}</h3>
-              <p><FaMapMarkerAlt /> {d.location || "Near Sports Complex, Central Campus"}</p>
-            </div>
-          </div>
-          <div className="dispensary-body">
-            <div className="dispensary-hours">
-              <h4><FaClock /> Operating Hours</h4>
-              <ul>
-                {d.hours && Array.isArray(d.hours) ? (
-                  d.hours.map((h, i) => <li key={i}>{h}</li>)
-                ) : (
-                  <li>24x7 Emergency Services Available</li>
-                )}
-              </ul>
-            </div>
-            <div className="dispensary-contact">
-              <h4><FaPhoneAlt /> Emergency Hotline</h4>
-              <p className="phone-highlight">{d.phone || "+91-175-2393100"}</p>
-            </div>
-          </div>
+        <div className="markdown-content">
+          <ReactMarkdown>{typeof msg.rawData?.response === "string" ? msg.rawData.response : String(msg.text || "Message processed.")}</ReactMarkdown>
         </div>
       );
     }
-
-    return <pre className="json-raw">{JSON.stringify(data, null, 2)}</pre>;
   };
 
   return (
@@ -679,7 +713,11 @@ function App() {
                     </div>
                   )}
                   <div className={`message-bubble ${msg.from === "user" ? "user-bubble" : "bot-bubble"}`}>
-                    {renderBotContent(msg, index)}
+                    {msg.from === "user" ? (
+                      <div className="user-message-text">{msg.text}</div>
+                    ) : (
+                      renderBotContent(msg, index)
+                    )}
                     {msg.from === "bot" && (
                       <div className="bubble-actions">
                         <button
@@ -765,7 +803,7 @@ function App() {
                 <div key={f.FacultyID} className="modern-faculty-card">
                   <div className="faculty-card-top">
                     <div className="faculty-avatar-circle">
-                      {f.Name.replace(/Dr\.|Prof\./gi, "").trim().charAt(0)}
+                      {String(f.Name || f.name || "Faculty").replace(/Dr\.|Prof\./gi, "").trim().charAt(0) || "F"}
                     </div>
                     <div>
                       <h4 className="faculty-name">{f.Name}</h4>

@@ -8,3 +8,9 @@ node_modules/
 campusgpt-frontend/build/
 
 .vercel
+__pycache__/
+*.pyc
+.pytest_cache/
+venv/
+.venv/
+*.zip
