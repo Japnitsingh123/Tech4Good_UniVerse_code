@@ -58,7 +58,6 @@ async def get_doaa_procedures():
 @router.post("/api/chat/")
 @router.post("/chat")
 @router.post("/chat/")
-@router.post("")
 @router.post("/")
 async def handle_chat(req: ChatRequest):
     try:
