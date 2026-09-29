@@ -3,6 +3,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.routes.chat_route import router as chat_router
+from app.routes.faculty_route import router as faculty_router
 from app.services.timetable_service import load_timetable_data
 from app.services.subject_service import load_subject_data
 from app.db import test_db_connection
@@ -38,6 +39,7 @@ app.add_middleware(
 
 # Mount Routes
 app.include_router(chat_router)
+app.include_router(faculty_router)
 
 @app.get("/")
 def root():

@@ -11,7 +11,7 @@ import {
   FaGraduationCap
 } from "react-icons/fa";
 
-const Sidebar = ({ activeTab, onTabClick }) => {
+const Sidebar = ({ activeTab, onTabClick, isFaculty, onFacultyClick }) => {
   const menuItems = [
     { id: "chat", label: "AI Assistant", icon: <FaRobot />, badge: "AI" },
     { id: "timetable", label: "Timetables", icon: <FaCalendarAlt /> },
@@ -52,6 +52,13 @@ const Sidebar = ({ activeTab, onTabClick }) => {
       </nav>
 
       <div className="sidebar-footer-card">
+        <button
+          className={`faculty-sidebar-btn ${isFaculty ? "active" : ""}`}
+          onClick={onFacultyClick}
+          type="button"
+        >
+          {isFaculty ? "👨‍🏫 Faculty: Logout" : "🔒 Faculty Login"}
+        </button>
         <div className="footer-status-indicator">
           <span className="status-dot"></span>
           <span>System Online</span>
