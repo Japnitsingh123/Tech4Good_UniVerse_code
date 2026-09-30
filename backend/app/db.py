@@ -97,25 +97,3 @@ def test_db_connection() -> bool:
         _is_db_reachable = False
         print(f"[INFO] MySQL server is currently offline or unreachable on {DB_HOST}:{DB_PORT}. Local faculty knowledge base (546 records) is active.")
         return False
-
-def update_faculty_db(faculty_id: int, name: str, department: str, email: str, office: str, specialization: str, link: Optional[str] = "") -> bool:
-    """
-    Updates faculty details in the MySQL Faculty table.
-    """
-    global _is_db_reachable
-    try:
-        conn = get_connection()
-        with conn.cursor() as cursor:
-            sql = """
-                UPDATE `Faculty`
-                SET `Name`=%s, `Department`=%s, `Email`=%s, `Office`=%s, `Specialization`=%s, `link`=%s
-                WHERE `FacultyID`=%s
-            """
-            cursor.execute(sql, (name, department, email, office, specialization, link or "", faculty_id))
-        conn.close()
-        _is_db_reachable = True
-        print(f"[OK] Successfully updated Faculty #{faculty_id} in MySQL database.")
-        return True
-    except Exception as err:
-        print(f"[WARN] MySQL faculty update failed or DB unreachable: {err}")
-        return False

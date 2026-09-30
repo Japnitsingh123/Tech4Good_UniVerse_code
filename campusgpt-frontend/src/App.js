@@ -25,10 +25,7 @@ import {
   FaQrcode,
   FaTimes,
   FaChevronRight,
-  FaHospitalAlt,
-  FaLock,
-  FaUserShield,
-  FaEdit
+  FaHospitalAlt
 } from "react-icons/fa";
 
 // Embedded data for instant dedicated tab browsing
@@ -282,145 +279,6 @@ function App() {
   const [selectedDay, setSelectedDay] = useState("Monday");
   const [batchSchedule, setBatchSchedule] = useState(null);
   const [batchLoading, setBatchLoading] = useState(false);
-
-  // Faculty Auth State
-  const [facultyUser, setFacultyUser] = useState(() => {
-    try {
-      const saved = localStorage.getItem("campusgpt_faculty");
-      return saved ? JSON.parse(saved) : null;
-    } catch {
-      return null;
-    }
-  });
-  const isFaculty = Boolean(facultyUser && facultyUser.token);
-  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
-  const [loginPasscode, setLoginPasscode] = useState("");
-  const [loginEmail, setLoginEmail] = useState("");
-  const [loginError, setLoginError] = useState("");
-
-  // Faculty Edit Modals State
-  const [editingFaculty, setEditingFaculty] = useState(null);
-  const [editingTimetable, setEditingTimetable] = useState(null);
-  const [editingSubject, setEditingSubject] = useState(null);
-  const [saveStatus, setSaveStatus] = useState("");
-
-  const handleFacultyLogin = async (e) => {
-    e.preventDefault();
-    setLoginError("");
-    try {
-      const res = await fetch(`${API_URL}/api/faculty/login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email: loginEmail.trim() || "faculty@thapar.edu",
-          passcode: loginPasscode.trim()
-        }),
-      });
-      const data = await res.json();
-      if (res.ok && data.token) {
-        const u = { token: data.token, ...data.user };
-        setFacultyUser(u);
-        localStorage.setItem("campusgpt_faculty", JSON.stringify(u));
-        setIsLoginModalOpen(false);
-        setLoginPasscode("");
-      } else {
-        setLoginError(data.detail || "Incorrect faculty passcode. (Default: thapar@faculty2026)");
-      }
-    } catch (err) {
-      setLoginError("Could not reach authentication server.");
-    }
-  };
-
-  const handleFacultyLogout = () => {
-    setFacultyUser(null);
-    localStorage.removeItem("campusgpt_faculty");
-  };
-
-  const handleSaveFaculty = async (e) => {
-    e.preventDefault();
-    setSaveStatus("Saving to MySQL & local store...");
-    try {
-      const res = await fetch(`${API_URL}/api/faculty/update-profile`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${facultyUser?.token}`
-        },
-        body: JSON.stringify(editingFaculty),
-      });
-      const data = await res.json();
-      if (res.ok) {
-        setSaveStatus("✅ Saved successfully!");
-        setTimeout(() => {
-          setEditingFaculty(null);
-          setSaveStatus("");
-        }, 1200);
-      } else {
-        setSaveStatus("❌ " + (data.detail || "Error saving"));
-      }
-    } catch (err) {
-      setSaveStatus("❌ Connection error");
-    }
-  };
-
-  const handleSaveTimetable = async (e) => {
-    e.preventDefault();
-    setSaveStatus("Saving timetable slot to file...");
-    try {
-      const res = await fetch(`${API_URL}/api/faculty/update-timetable`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${facultyUser?.token}`
-        },
-        body: JSON.stringify({
-          batch: selectedBatch,
-          day: selectedDay,
-          ...editingTimetable
-        }),
-      });
-      const data = await res.json();
-      if (res.ok) {
-        setSaveStatus("✅ Timetable updated!");
-        fetchTimetableTab(selectedBatch, selectedDay);
-        setTimeout(() => {
-          setEditingTimetable(null);
-          setSaveStatus("");
-        }, 1200);
-      } else {
-        setSaveStatus("❌ " + (data.detail || "Error saving"));
-      }
-    } catch (err) {
-      setSaveStatus("❌ Connection error");
-    }
-  };
-
-  const handleSaveSubject = async (e) => {
-    e.preventDefault();
-    setSaveStatus("Saving subject credits to file...");
-    try {
-      const res = await fetch(`${API_URL}/api/faculty/update-subject`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${facultyUser?.token}`
-        },
-        body: JSON.stringify(editingSubject),
-      });
-      const data = await res.json();
-      if (res.ok) {
-        setSaveStatus("✅ Subject credits updated!");
-        setTimeout(() => {
-          setEditingSubject(null);
-          setSaveStatus("");
-        }, 1200);
-      } else {
-        setSaveStatus("❌ " + (data.detail || "Error saving"));
-      }
-    } catch (err) {
-      setSaveStatus("❌ Connection error");
-    }
-  };
 
   const messagesEndRef = useRef(null);
   const mapCompRef = useRef(null);
@@ -695,23 +553,6 @@ function App() {
                 <p>{s.description || s.desc}</p>
               </div>
             )}
-            {isFaculty && (
-              <div style={{ marginTop: "12px", display: "flex", justifyContent: "flex-end" }}>
-                <button
-                  type="button"
-                  className="edit-subject-action-btn"
-                  onClick={() => setEditingSubject({
-                    code: s.code || s.subjectCode || "",
-                    name: s.name || s.title || "",
-                    credit: s.credit || s.credits || "4.0",
-                    ltp: s.ltp || "3-0-2",
-                    description: s.description || s.desc || ""
-                  })}
-                >
-                  <FaEdit /> Edit Course & Credits
-                </button>
-              </div>
-            )}
           </div>
         );
       }
@@ -803,12 +644,7 @@ function App() {
   return (
     <div className="app-layout">
       {/* 1. SIDEBAR */}
-      <Sidebar
-        activeTab={activeTab}
-        onTabClick={setActiveTab}
-        isFaculty={isFaculty}
-        onFacultyClick={() => isFaculty ? handleFacultyLogout() : setIsLoginModalOpen(true)}
-      />
+      <Sidebar activeTab={activeTab} onTabClick={setActiveTab} />
 
       {/* 2. MAIN WORKSPACE */}
       <main className="main-viewport">
@@ -824,23 +660,6 @@ function App() {
                 <p>Real-time university timetable, faculty directory, cafeterias & DOAA guidance</p>
               </div>
               <div className="header-actions">
-                {isFaculty ? (
-                  <button
-                    className="glass-btn faculty-active-pill"
-                    onClick={handleFacultyLogout}
-                    title="Faculty Mode Active. Click to Logout."
-                  >
-                    <FaUserShield /> Faculty: Logout
-                  </button>
-                ) : (
-                  <button
-                    className="glass-btn"
-                    onClick={() => setIsLoginModalOpen(true)}
-                    title="Faculty Login for Edit Access"
-                  >
-                    <FaLock /> Faculty Login
-                  </button>
-                )}
                 <button
                   className="glass-btn"
                   onClick={clearChat}
@@ -1015,15 +834,6 @@ function App() {
                     >
                       Ask in Chat
                     </button>
-                    {isFaculty && (
-                      <button
-                        className="ask-chat-btn faculty-edit-btn"
-                        onClick={() => setEditingFaculty({ ...f })}
-                        title="Edit profile in MySQL DB & local store"
-                      >
-                        <FaEdit /> Edit
-                      </button>
-                    )}
                   </div>
                 </div>
               ))}
@@ -1093,7 +903,6 @@ function App() {
                         <th>Subject / Course</th>
                         <th>Component</th>
                         <th>Classroom / Lab</th>
-                        {isFaculty && <th>Action</th>}
                       </tr>
                     </thead>
                     <tbody>
@@ -1107,22 +916,6 @@ function App() {
                             </span>
                           </td>
                           <td className="room-cell">📍 {slot.room}</td>
-                          {isFaculty && (
-                            <td>
-                              <button
-                                className="edit-slot-inline-btn"
-                                onClick={() => setEditingTimetable({
-                                  time: slot.time,
-                                  subject: slot.subject,
-                                  room: slot.room,
-                                  type: slot.type || "L"
-                                })}
-                                title="Edit this slot in timetable-data.json"
-                              >
-                                <FaEdit /> Edit
-                              </button>
-                            </td>
-                          )}
                         </tr>
                       ))}
                     </tbody>
@@ -1278,236 +1071,6 @@ function App() {
 
       {/* MODALS */}
       {isModalOpen && <UserManualModal onClose={() => setIsModalOpen(false)} />}
-
-      {/* 1. FACULTY LOGIN MODAL */}
-      {isLoginModalOpen && (
-        <div className="fullscreen-image-overlay" onClick={() => setIsLoginModalOpen(false)}>
-          <div className="faculty-modal-card" onClick={(e) => e.stopPropagation()}>
-            <div className="faculty-modal-header">
-              <h3><FaLock /> Faculty Portal Login</h3>
-              <button className="lightbox-close-btn" onClick={() => setIsLoginModalOpen(false)}><FaTimes /></button>
-            </div>
-            <form onSubmit={handleFacultyLogin} className="faculty-modal-form">
-              <p className="faculty-modal-desc">
-                Log in to edit your faculty profile (MySQL), class timetables, and subject credits.
-              </p>
-              <div className="form-group">
-                <label>Faculty Email</label>
-                <input
-                  type="email"
-                  placeholder="e.g. rkgupta@thapar.edu"
-                  value={loginEmail}
-                  onChange={(e) => setLoginEmail(e.target.value)}
-                  required
-                />
-              </div>
-              <div className="form-group">
-                <label>Faculty Passcode</label>
-                <input
-                  type="password"
-                  placeholder="Enter passcode (default: thapar@faculty2026)"
-                  value={loginPasscode}
-                  onChange={(e) => setLoginPasscode(e.target.value)}
-                  required
-                />
-              </div>
-              {loginError && <div className="modal-error-alert">{loginError}</div>}
-              <div className="modal-actions-row">
-                <button type="button" className="glass-btn" onClick={() => setIsLoginModalOpen(false)}>Cancel</button>
-                <button type="submit" className="glass-btn primary"><FaUserShield /> Log In as Faculty</button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* 2. EDIT FACULTY MODAL (UPDATES MYSQL DB + LOCAL JSON) */}
-      {editingFaculty && (
-        <div className="fullscreen-image-overlay" onClick={() => setEditingFaculty(null)}>
-          <div className="faculty-modal-card" onClick={(e) => e.stopPropagation()}>
-            <div className="faculty-modal-header">
-              <h3><FaEdit /> Edit Faculty Details</h3>
-              <button className="lightbox-close-btn" onClick={() => setEditingFaculty(null)}><FaTimes /></button>
-            </div>
-            <form onSubmit={handleSaveFaculty} className="faculty-modal-form">
-              <div className="form-group">
-                <label>Full Name</label>
-                <input
-                  type="text"
-                  value={editingFaculty.Name || ""}
-                  onChange={(e) => setEditingFaculty({ ...editingFaculty, Name: e.target.value })}
-                  required
-                />
-              </div>
-              <div className="form-row-2">
-                <div className="form-group">
-                  <label>Department</label>
-                  <input
-                    type="text"
-                    value={editingFaculty.Department || ""}
-                    onChange={(e) => setEditingFaculty({ ...editingFaculty, Department: e.target.value })}
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Office Venue</label>
-                  <input
-                    type="text"
-                    value={editingFaculty.Office || ""}
-                    onChange={(e) => setEditingFaculty({ ...editingFaculty, Office: e.target.value })}
-                  />
-                </div>
-              </div>
-              <div className="form-group">
-                <label>Official Email</label>
-                <input
-                  type="email"
-                  value={editingFaculty.Email || ""}
-                  onChange={(e) => setEditingFaculty({ ...editingFaculty, Email: e.target.value })}
-                />
-              </div>
-              <div className="form-group">
-                <label>Research Specialization / Focus Areas</label>
-                <textarea
-                  rows="2"
-                  value={editingFaculty.Specialization || ""}
-                  onChange={(e) => setEditingFaculty({ ...editingFaculty, Specialization: e.target.value })}
-                />
-              </div>
-              {saveStatus && <div className="modal-status-badge">{saveStatus}</div>}
-              <div className="modal-actions-row">
-                <button type="button" className="glass-btn" onClick={() => setEditingFaculty(null)}>Cancel</button>
-                <button type="submit" className="glass-btn primary">Save to MySQL & Local Store</button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* 3. EDIT TIMETABLE SLOT MODAL (UPDATES LOCAL timetable-data.json) */}
-      {editingTimetable && (
-        <div className="fullscreen-image-overlay" onClick={() => setEditingTimetable(null)}>
-          <div className="faculty-modal-card" onClick={(e) => e.stopPropagation()}>
-            <div className="faculty-modal-header">
-              <h3><FaCalendarAlt /> Edit Class Slot ({selectedBatch} — {selectedDay})</h3>
-              <button className="lightbox-close-btn" onClick={() => setEditingTimetable(null)}><FaTimes /></button>
-            </div>
-            <form onSubmit={handleSaveTimetable} className="faculty-modal-form">
-              <div className="form-row-2">
-                <div className="form-group">
-                  <label>Batch</label>
-                  <input type="text" value={selectedBatch} disabled />
-                </div>
-                <div className="form-group">
-                  <label>Day</label>
-                  <input type="text" value={selectedDay} disabled />
-                </div>
-              </div>
-              <div className="form-group">
-                <label>Time Slot</label>
-                <input type="text" value={editingTimetable.time || ""} disabled />
-              </div>
-              <div className="form-group">
-                <label>Course / Subject</label>
-                <input
-                  type="text"
-                  value={editingTimetable.subject || ""}
-                  onChange={(e) => setEditingTimetable({ ...editingTimetable, subject: e.target.value })}
-                  placeholder="e.g. UCS312 / COMPUTER PROGRAMMING"
-                  required
-                />
-              </div>
-              <div className="form-row-2">
-                <div className="form-group">
-                  <label>Classroom / Lab Venue</label>
-                  <input
-                    type="text"
-                    value={editingTimetable.room || ""}
-                    onChange={(e) => setEditingTimetable({ ...editingTimetable, room: e.target.value })}
-                    placeholder="e.g. LP101 or CSED-LAB2"
-                    required
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Component</label>
-                  <select
-                    value={editingTimetable.type || "L"}
-                    onChange={(e) => setEditingTimetable({ ...editingTimetable, type: e.target.value })}
-                  >
-                    <option value="L">Lecture (L)</option>
-                    <option value="P">Practical (P)</option>
-                    <option value="T">Tutorial (T)</option>
-                  </select>
-                </div>
-              </div>
-              {saveStatus && <div className="modal-status-badge">{saveStatus}</div>}
-              <div className="modal-actions-row">
-                <button type="button" className="glass-btn" onClick={() => setEditingTimetable(null)}>Cancel</button>
-                <button type="submit" className="glass-btn primary">Update Timetable Slot</button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* 4. EDIT SUBJECT CREDITS MODAL (UPDATES LOCAL subjects.json) */}
-      {editingSubject && (
-        <div className="fullscreen-image-overlay" onClick={() => setEditingSubject(null)}>
-          <div className="faculty-modal-card" onClick={(e) => e.stopPropagation()}>
-            <div className="faculty-modal-header">
-              <h3><FaEdit /> Edit Subject: {editingSubject.code}</h3>
-              <button className="lightbox-close-btn" onClick={() => setEditingSubject(null)}><FaTimes /></button>
-            </div>
-            <form onSubmit={handleSaveSubject} className="faculty-modal-form">
-              <div className="form-group">
-                <label>Subject Code</label>
-                <input type="text" value={editingSubject.code} disabled />
-              </div>
-              <div className="form-group">
-                <label>Course Name</label>
-                <input
-                  type="text"
-                  value={editingSubject.name || ""}
-                  onChange={(e) => setEditingSubject({ ...editingSubject, name: e.target.value })}
-                  required
-                />
-              </div>
-              <div className="form-row-2">
-                <div className="form-group">
-                  <label>Credits</label>
-                  <input
-                    type="text"
-                    value={editingSubject.credit || ""}
-                    onChange={(e) => setEditingSubject({ ...editingSubject, credit: e.target.value })}
-                    placeholder="e.g. 4.0 or 3.5"
-                    required
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Structure (L-T-P)</label>
-                  <input
-                    type="text"
-                    value={editingSubject.ltp || "3-0-2"}
-                    onChange={(e) => setEditingSubject({ ...editingSubject, ltp: e.target.value })}
-                  />
-                </div>
-              </div>
-              <div className="form-group">
-                <label>Syllabus & Course Description</label>
-                <textarea
-                  rows="3"
-                  value={editingSubject.description || ""}
-                  onChange={(e) => setEditingSubject({ ...editingSubject, description: e.target.value })}
-                />
-              </div>
-              {saveStatus && <div className="modal-status-badge">{saveStatus}</div>}
-              <div className="modal-actions-row">
-                <button type="button" className="glass-btn" onClick={() => setEditingSubject(null)}>Cancel</button>
-                <button type="submit" className="glass-btn primary">Update Subject Credits</button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
 
       {fullScreenImage && (
         <div
